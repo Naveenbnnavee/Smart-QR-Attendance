@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - QR Attendance</title>
+    <!-- Assuming you have these CSS files or they are served via public -->
+    <!-- <link rel="stylesheet" href="/css/styles.css"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #000; color: #fff; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        
+        /* BACKGROUND ANIMATION */
+        .background-anim { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; overflow: hidden; background: linear-gradient(45deg, #0f0c29, #302b63, #24243e); }
+        .background-anim span { position: absolute; display: block; width: 20px; height: 20px; background: rgba(255, 255, 255, 0.2); animation: animate 25s linear infinite; bottom: -150px; }
+        .background-anim span:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .background-anim span:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .background-anim span:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        .background-anim span:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+        .background-anim span:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+        .background-anim span:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
+        @keyframes animate { 0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; } 100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; } }
+
+        /* TOP BAR */
+        .top-bar { width: 100%; padding: 20px 40px; position: fixed; top: 0; z-index: 100; backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .top-bar-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo-area { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.2rem; letter-spacing: 1px; color: #a29bfe; }
+        .icon-btn { color: white; opacity: 0.7; transition: 0.3s; }
+        .icon-btn:hover { opacity: 1; transform: scale(1.1); }
+
+        /* MAIN LAYOUT */
+        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; margin-top: 60px; }
+        .container { width: 100%; max-width: 400px; perspective: 1000px; }
+
+        /* LOGIN CARD */
+        .card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border-radius: 20px; padding: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        
+        .role-toggle-container { background: rgba(0,0,0,0.3); border-radius: 30px; padding: 5px; display: flex; position: relative; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
+        .role-toggle-container input { display: none; }
+        .toggle-btn { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 25px; font-size: 0.9rem; transition: 0.3s; color: rgba(255,255,255,0.6); font-weight: 500; }
+        
+        /* Toggle Logic using Peer selector */
+        input#role-student:checked ~ label[for="role-student"],
+        input#role-teacher:checked ~ label[for="role-teacher"] { background: #6c5ce7; color: white; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); }
+
+        /* FORM ELEMENTS */
+        .input-group { margin-bottom: 15px; position: relative; }
+        .input-group input { width: 100%; padding: 15px 20px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; outline: none; transition: 0.3s; font-size: 0.95rem; }
+        .input-group input:focus { border-color: #a29bfe; background: rgba(0,0,0,0.4); box-shadow: 0 0 10px rgba(162, 155, 254, 0.1); }
+        
+        .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); border: none; border-radius: 12px; color: white; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(108, 92, 231, 0.5); }
+
+        .forgot-link { display: block; text-align: right; font-size: 0.8rem; color: #a29bfe; margin-top: 5px; text-decoration: none; transition: 0.3s; }
+        .forgot-link:hover { text-decoration: underline; color: #fff; }
+
+        .login-footer { margin-top: 25px; font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+        .login-footer a { color: #fff; text-decoration: none; font-weight: 600; margin-left: 5px; }
+        .login-footer a:hover { text-decoration: underline; }
+
+        .error-badge { background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #ff7675; padding: 10px; border-radius: 10px; margin-bottom: 20px; font-size: 0.85rem; }
+        .success-badge { background: rgba(46, 204, 113, 0.2); border: 1px solid #2ecc71; color: #55efc4; padding: 10px; border-radius: 10px; margin-bottom: 20px; font-size: 0.85rem; }
+
+        .eye-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; }
+        .eye-icon:hover { opacity: 1; }
+
+        /* ANTI-SCREENSHOT OVERLAY */
+        .privacy-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: none; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: bold; }
+        @media print { body { display: none; } }
+    </style>
+</head>
+<body>
+
+<!-- Privacy Screen -->
+<div class="privacy-screen" id="privacyScreen">Screenshots are disabled for security.</div>
+
+<div class="background-anim"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="logo-area">
+            <div class="logo-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div>
+            <span class="logo-text">QR Attendance</span>
+        </div>
+        <a href="/" class="icon-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></a>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="container">
+        <div class="card login-card">
+            <div style="margin-bottom: 25px;">
+                <h1 style="font-size: 1.8rem; margin-bottom: 5px;">Secure Login</h1>
+                <p style="font-size: 0.9rem; opacity:0.6;">Please enter your credentials.</p>
+            </div>
+
+            <% if (error) { %>
+                <div class="error-badge"><%= error %></div>
+            <% } %>
+            
+            <% if (locals.success) { %>
+                <div class="success-badge"><%= success %></div>
+            <% } %>
+
+            <form action="/login" method="POST">
+                <div class="role-toggle-container">
+                    <input type="radio" id="role-student" name="role" value="user" checked>
+                    <label for="role-student" class="toggle-btn">Student</label>
+                    <input type="radio" id="role-teacher" name="role" value="client">
+                    <label for="role-teacher" class="toggle-btn">Teacher</label>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Username / ID" required>
+                </div>
+                
+                <div class="input-group" style="position: relative;">
+                    <input type="password" name="password" id="passwordInput" placeholder="Password" required>
+                    <span onclick="togglePassword()" class="eye-icon">👁</span>
+                </div>
+                
+                <!-- CHANGED: Direct link to the Forgot Password page -->
+                <a href="/forgot-password" class="forgot-link">Forgot Password?</a>
+
+                <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Login Now</button>
+            </form>
+
+            <div class="login-footer">
+                <span>New User?</span> <a href="/register">Create Account</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        const input = document.getElementById('passwordInput');
+        input.type = input.type === "password" ? "text" : "password";
+    }
+
+    // --- ANTI-SCREENSHOT LOGIC ---
+    document.addEventListener('keyup', (e) => {
+        if (e.key == 'PrintScreen') {
+            navigator.clipboard.writeText('');
+            alert('Screenshots are restricted!');
+        }
+    });
+</script>
+
+</body>
+</html>

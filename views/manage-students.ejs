@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Database</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        body { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: white; margin: 0; min-height: 100vh; }
+        
+        /* --- NAVIGATION STYLES --- */
+        .top-bar { width: 100%; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 12, 41, 0.95); border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 1000; box-sizing: border-box; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { width: 32px; height: 32px; background: #00d2d3; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; }
+        
+        .sub-nav { background: rgba(255, 255, 255, 0.05); padding: 10px 40px; display: flex; gap: 20px; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .sub-nav a { color: #a29bfe; text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 5px 10px; border-radius: 6px; transition: 0.3s; }
+        .sub-nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+        .sub-nav .active-link { background: rgba(108, 92, 231, 0.3); color: #fff; }
+        .welcome-msg { margin-left: auto; font-size: 0.9rem; color: #fab1a0; font-weight: 600; }
+
+        /* --- CONTENT STYLES --- */
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        
+        .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; margin-bottom: 30px; backdrop-filter: blur(10px); }
+        
+        /* Add Form */
+        .add-form { display: flex; flex-direction: column; gap: 15px; }
+        .form-row { display: flex; gap: 15px; flex-wrap: wrap;}
+        input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); padding: 12px 15px; border-radius: 8px; color: white; flex: 1; font-family: 'Poppins', sans-serif; min-width: 200px; outline: none; }
+        input:focus { border-color: #6c5ce7; }
+        
+        .btn-add { background: linear-gradient(135deg, #00b894, #00cec9); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.2s; margin-top: 10px; }
+        .btn-add:disabled { background: #636e72; cursor: not-allowed; opacity: 0.7; }
+        .btn-add:hover:not(:disabled) { transform: translateY(-2px); }
+
+        /* Photo Upload */
+        .photo-upload-area { display: flex; gap: 20px; align-items: center; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.2); }
+        .preview-box { width: 60px; height: 60px; background: #2d3436; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 0.8rem; border: 2px solid rgba(255,255,255,0.1); }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .file-label { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .file-label:hover { background: rgba(255,255,255,0.2); }
+        .ai-status { font-size: 0.8rem; margin-top: 5px; color: #a29bfe; font-weight: 500; }
+
+        /* Student List */
+        .student-list { max-height: 500px; overflow-y: auto; padding-right: 5px; }
+        .student-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.03); margin-bottom: 10px; border-radius: 12px; transition: 0.2s; border: 1px solid rgba(255,255,255,0.05); }
+        .student-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+        
+        .s-info { display: flex; align-items: center; gap: 15px; }
+        .s-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid rgba(255,255,255,0.1); }
+        .s-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .status-verified { color: #00b894; font-size: 0.75rem; background: rgba(0, 184, 148, 0.15); padding: 2px 8px; border-radius: 10px; }
+        .btn-del { background: rgba(255, 71, 87, 0.15); color: #ff6b81; border: 1px solid rgba(255, 71, 87, 0.2); padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
+        .btn-del:hover { background: #ff6b81; color: white; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="logo-area">
+        <div class="logo-icon">QR</div>
+        <span style="font-weight: 600; letter-spacing: 0.5px;">Teacher Dashboard</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <span id="liveClock" style="font-family: monospace; color: #00d2d3;"></span>
+        <a href="/logout" style="color: #ff7675; text-decoration:none; font-size:0.9rem;">Logout</a>
+    </div>
+</div>
+
+<div class="sub-nav">
+    <a href="/client/dashboard">Dashboard</a>
+    <a href="/client/verify-students">Verify Students (<%= pendingCount %>)</a>
+    <a href="/client/manage-students" class="active-link">Student Database</a>
+    <a href="/profile">Profile</a>
+    <span class="welcome-msg">Welcome, <%= username %>!</span>
+</div>
+
+<div class="container">
+    <% if(error) { %> <div style="background: rgba(255,71,87,0.2); color: #ff6b81; padding: 12px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(255,71,87,0.3);"><%= error %></div> <% } %>
+    <% if(success) { %> <div style="background: rgba(0,184,148,0.2); color: #00b894; padding: 12px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(0,184,148,0.3);"><%= success %></div> <% } %>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Add New Student</h3>
+        <p style="font-size:0.9rem; opacity:0.6; margin-bottom:20px;">Manually register a student. Photo required for AI.</p>
+        
+        <form action="/client/add-student" method="POST" class="add-form">
+            <div class="form-row">
+                <input type="text" name="username" placeholder="Username / ID" required autocomplete="off">
+                <input type="password" name="password" placeholder="Default Password" required>
+            </div>
+            <div class="form-row">
+                <input type="tel" name="phone" placeholder="Phone Number (e.g., +91...)" required>
+            </div>
+
+            <div class="photo-upload-area">
+                <div class="preview-box" id="previewBox">Img</div>
+                <div style="flex:1;">
+                    <input type="file" id="fileInput" accept="image/*" style="display:none;">
+                    <label for="fileInput" class="file-label">Select Photo</label>
+                    <div id="aiStatus" class="ai-status">Waiting for photo...</div>
+                </div>
+            </div>
+
+            <input type="hidden" name="profilePhoto" id="profilePhoto">
+            <input type="hidden" name="faceDescriptor" id="faceDescriptor">
+
+            <button type="submit" class="btn-add" id="submitBtn" disabled>Add Student</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0; margin-bottom:20px;">Registered Students (<%= students.length %>)</h3>
+        
+        <div class="student-list">
+            <% students.forEach(s => { %>
+                <div class="student-item">
+                    <div class="s-info">
+                        <a href="/client/student/<%= s._id %>" style="text-decoration:none;">
+                            <div class="s-avatar">
+                                <% if(s.profilePhoto) { %> <img src="<%= s.profilePhoto %>"> <% } else { %> <%= s.username.charAt(0).toUpperCase() %> <% } %>
+                            </div>
+                        </a>
+                        <div>
+                            <a href="/client/student/<%= s._id %>" style="text-decoration:none; color:white;">
+                                <div style="font-weight: 600; font-size:1rem;"><%= s.username %></div>
+                            </a>
+                            <div style="display:flex; gap:15px; font-size:0.8rem; opacity:0.6; margin-top:2px;">
+                                <span><%= s.phone || 'No Phone' %></span>
+                                <% if(s.faceDescriptor) { %> <span class="status-verified">AI Ready</span> <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <form action="/client/delete-student/<%= s._id %>" method="POST" style="margin:0;" onsubmit="return confirm('Permanently delete <%= s.username %>?');">
+                        <button type="submit" class="btn-del">Delete</button>
+                    </form>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateClock() { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
+    setInterval(updateClock, 1000); updateClock();
+
+    const fileInput = document.getElementById('fileInput');
+    const previewBox = document.getElementById('previewBox');
+    const aiStatus = document.getElementById('aiStatus');
+    const submitBtn = document.getElementById('submitBtn');
+    const photoInput = document.getElementById('profilePhoto');
+    const faceInput = document.getElementById('faceDescriptor');
+
+    // Load AI Models
+    Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+        faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+    ]).then(() => {
+        aiStatus.innerText = "AI Ready. Select photo.";
+        aiStatus.style.color = "#a29bfe";
+    });
+
+    fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewBox.innerHTML = `<img src="${e.target.result}">`;
+            photoInput.value = e.target.result;
+            processFace(e.target.result);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    async function processFace(imageSrc) {
+        aiStatus.innerText = "Scanning face...";
+        aiStatus.style.color = "#fab1a0";
+        submitBtn.disabled = true;
+        try {
+            const img = await faceapi.fetchImage(imageSrc);
+            const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+            if (detection) {
+                faceInput.value = JSON.stringify(Array.from(detection.descriptor));
+                aiStatus.innerText = "✅ Face Verified";
+                aiStatus.style.color = "#00b894";
+                submitBtn.disabled = false;
+            } else {
+                aiStatus.innerText = "❌ No face detected";
+                aiStatus.style.color = "#ff7675";
+                submitBtn.disabled = true;
+            }
+        } catch (e) { console.error(e); aiStatus.innerText = "Error analyzing image."; }
+    }
+</script>
+</body>
+</html>

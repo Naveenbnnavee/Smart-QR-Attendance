@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student App - Attendance Evolved</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        body { padding-bottom: 90px; background: #0f0c29; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; color: white; font-family: 'Poppins', sans-serif; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 100; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 45px; height: 45px; background: linear-gradient(135deg, #00d2d3, #0abde3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(0, 210, 211, 0.3); border: 2px solid rgba(255,255,255,0.2); }
+        .user-text h2 { font-size: 1rem; margin: 0; line-height: 1.2; font-weight: 600; }
+        .user-text p { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin: 0; letter-spacing: 0.5px; }
+
+        .icon-group { display: flex; gap: 10px; }
+        .icon-btn { color: white; background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .icon-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .logout-btn { color: #ff6b81; background: rgba(255, 71, 87, 0.1); }
+        .logout-btn:hover { background: rgba(255, 71, 87, 0.2); }
+
+        .scan-container { padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 20px; }
+        .camera-viewport { width: 100%; max-width: 320px; aspect-ratio: 3/4; background: #000; border-radius: 24px; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 4px solid rgba(255,255,255,0.1); }
+        #faceVideo, #reader { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+        #faceVideo { transform: scaleX(-1); z-index: 1; }
+        #reader { z-index: 2; display: none; }
+        .scan-status { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; color: rgba(255,255,255,0.9); z-index: 10; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .status-dot { width: 8px; height: 8px; background: #fab1a0; border-radius: 50%; animation: pulse-orange 1.5s infinite; }
+        @keyframes pulse-orange { 0% {opacity: 1;} 50% {opacity: 0.4;} 100% {opacity: 1;} }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: #00d2d3; box-shadow: 0 0 10px #00d2d3; top: 0; left: 0; z-index: 5; animation: scan 2s infinite linear; display: none; opacity: 0.8; }
+        @keyframes scan { 0% {top: 0;} 50% {top: 100%;} 100% {top: 0;} }
+        .interaction-area { margin-top: 30px; width: 100%; max-width: 320px; display: flex; justify-content: center; }
+        .action-btn-large { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border: none; padding: 15px 0; border-radius: 15px; font-size: 1rem; font-weight: 600; box-shadow: 0 10px 30px rgba(108, 92, 231, 0.4); cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
+        .action-btn-large:disabled { background: #2d3436; color: rgba(255,255,255,0.3); box-shadow: none; cursor: not-allowed; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(15, 12, 41, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-around; padding: 15px 0; z-index: 100; }
+        .nav-item { color: rgba(255,255,255,0.4); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 500; transition: 0.3s; flex: 1; }
+        .nav-item.active { color: #a29bfe; }
+        .nav-item svg { width: 24px; height: 24px; stroke-width: 2; transition: 0.3s; }
+        .nav-item.active svg { transform: translateY(-3px); stroke: #a29bfe; stroke-width: 2.5; filter: drop-shadow(0 4px 5px rgba(162, 155, 254, 0.4)); }
+    </style>
+</head>
+<body>
+
+<div class="background-anim" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none;">
+    <span style="position:absolute; width:100px; height:100px; background:rgba(108,92,231,0.1); border-radius:50%; top:20%; left:10%;"></span>
+    <span style="position:absolute; width:150px; height:150px; background:rgba(0,210,211,0.05); border-radius:50%; bottom:10%; right:5%;"></span>
+</div>
+
+<div class="app-header">
+    <div class="user-info">
+        <div class="user-avatar"><%= username.charAt(0).toUpperCase() %></div>
+        <div class="user-text">
+            <h2>Hi, <%= username %></h2>
+            <p>Ready to check-in?</p>
+        </div>
+    </div>
+    <div class="icon-group">
+        <a href="/profile" class="icon-btn" title="My Profile">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </a>
+        <a href="/logout" class="icon-btn logout-btn" title="Logout">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </a>
+    </div>
+</div>
+
+<div class="scan-container">
+    <div class="camera-viewport">
+        <div class="scan-status" id="faceStatus">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Initializing AI...</span>
+        </div>
+        <div class="scan-line" id="scanLine"></div>
+        <video id="faceVideo" autoplay muted playsinline></video>
+        <div id="reader"></div>
+    </div>
+    <div class="interaction-area">
+        <button id="verifyFaceBtn" class="action-btn-large" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            Verify Face
+        </button>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a href="#" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
+        Scan
+    </a>
+    <a href="/user/history" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        History
+    </a>
+</nav>
+
+<script>
+    const rawFaceData = JSON.parse('<%- JSON.stringify(faceDescriptor || null) %>');
+    let storedDescriptor = null;
+
+    if (rawFaceData) {
+        try {
+            if (Array.isArray(rawFaceData)) storedDescriptor = new Float32Array(rawFaceData);
+            else if (typeof rawFaceData === 'object') storedDescriptor = new Float32Array(Object.values(rawFaceData));
+            else if (typeof rawFaceData === 'string') storedDescriptor = new Float32Array(JSON.parse(rawFaceData));
+        } catch (e) { console.error("Data Parse Error", e); }
+    }
+
+    if (storedDescriptor && storedDescriptor.length !== 128) {
+        alert("Face data corrupted. Please re-register.");
+        storedDescriptor = null;
+    }
+
+    const faceVideo = document.getElementById('faceVideo');
+    const verifyBtn = document.getElementById('verifyFaceBtn');
+    const statusText = document.getElementById('statusText');
+    const statusDot = document.getElementById('statusDot');
+    const scanLine = document.getElementById('scanLine');
+
+    if (typeof faceapi !== 'undefined') {
+        Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+        ]).then(startFaceCamera).catch(err => {
+            statusText.innerText = "Error loading AI. Refresh.";
+        });
+    } else {
+        statusText.innerText = "AI Library Offline.";
+    }
+
+    function startFaceCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(stream => {
+                faceVideo.srcObject = stream;
+                verifyBtn.disabled = false;
+                statusText.innerText = "Camera Active";
+                statusDot.style.background = "#00b894";
+            })
+            .catch(() => { statusText.innerText = "Camera Denied"; statusDot.style.background = "#ff7675"; });
+    }
+
+    verifyBtn.addEventListener('click', async () => {
+        if(!storedDescriptor) { alert("No valid face data."); return; }
+
+        statusText.innerText = "Analyzing...";
+        verifyBtn.innerText = "Processing...";
+        verifyBtn.disabled = true;
+        
+        const detection = await faceapi.detectSingleFace(faceVideo, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+
+        if (detection) {
+            const distance = faceapi.euclideanDistance(detection.descriptor, storedDescriptor);
+            
+            if (distance < 0.6) { 
+                statusText.innerText = "Verified!";
+                statusDot.style.background = "#00b894";
+                verifyBtn.innerText = "Scanning QR...";
+                verifyBtn.style.background = "#00b894"; 
+                
+                const stream = faceVideo.srcObject;
+                if(stream) stream.getTracks().forEach(t => t.stop());
+                faceVideo.style.display = 'none';
+                setTimeout(startQRScanner, 500);
+            } else {
+                statusText.innerText = "No Match";
+                statusDot.style.background = "#ff7675";
+                verifyBtn.innerText = "Retry Verify";
+                verifyBtn.disabled = false;
+            }
+        } else {
+            statusText.innerText = "Face Not Found";
+            statusDot.style.background = "#ff7675";
+            verifyBtn.innerText = "Retry";
+            verifyBtn.disabled = false;
+        }
+    });
+
+    function startQRScanner() {
+        const html5QrCode = new Html5Qrcode("reader");
+        document.getElementById('reader').style.display = 'block';
+        scanLine.style.display = 'block'; 
+        
+        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 200 }, (decodedText) => {
+            html5QrCode.stop();
+            scanLine.style.display = 'none';
+            markAttendance(decodedText);
+        });
+    }
+
+    function markAttendance(url) {
+        if (!navigator.geolocation) {
+            Swal.fire({ icon: 'error', title: 'GPS Failed', text: 'Geolocation is not supported by your browser.', background: '#2d3436', color:'white' });
+            return;
+        }
+
+        Swal.fire({ title: 'Acquiring Secure Satellite Link...', allowOutsideClick: false, background: '#2d3436', color:'white', didOpen: () => { Swal.showLoading(); } });
+
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            
+            let deviceId = localStorage.getItem('qr_attendance_device_id');
+            if (!deviceId) {
+                deviceId = 'dev-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('qr_attendance_device_id', deviceId);
+            }
+            
+            const fetchUrl = `${url}&deviceId=${deviceId}&lat=${lat}&lng=${lng}`;
+            
+            fetch(fetchUrl, { method: 'GET', headers: {'Accept': 'application/json'} })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    Swal.fire({ icon: 'success', title: 'Verified', text: data.message, background: '#2d3436', color:'white' });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Verification Failed', text: data.message, background: '#2d3436', color:'white' });
+                }
+            });
+        }, (err) => {
+            Swal.fire({ icon: 'error', title: 'Location Denied', text: 'You must allow location access to verify classroom geo-fencing requirements.', background: '#2d3436', color:'white' });
+        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    }
+</script>
+
+</body>
+</html>

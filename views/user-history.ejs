@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My History</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .history-container {
+            max-width: 600px; margin: 0 auto; padding: 20px 20px 100px;
+        }
+        
+        .stats-overview {
+            display: flex; gap: 15px; margin-bottom: 30px;
+        }
+        .stat-card {
+            flex: 1; background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            padding: 20px; border-radius: 20px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-num { font-size: 1.8rem; font-weight: 700; margin-bottom: 5px; }
+        .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Timeline */
+        .timeline { position: relative; border-left: 2px solid rgba(255,255,255,0.1); margin-left: 10px; padding-left: 25px; }
+        
+        .timeline-item {
+            margin-bottom: 25px; position: relative;
+            background: rgba(255,255,255,0.03); border-radius: 16px; padding: 15px 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .timeline-dot {
+            position: absolute; left: -31px; top: 15px;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #00b894; border: 3px solid #0f0c29;
+        }
+
+        .back-fab {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #2d3436; padding: 12px 25px; border-radius: 30px;
+            color: white; text-decoration: none; font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+<div class="background-anim"><span></span><span></span></div>
+
+<div class="history-container">
+    <h1 style="margin-bottom: 20px;">Your Activity</h1>
+
+    <!-- Stats Row (Calculating basic total from subjectStats passed) -->
+    <% 
+        let totalAttended = 0;
+        let overallPerc = 0;
+        let count = 0;
+        subjectStats.forEach(s => { 
+            totalAttended += s.attended; 
+            overallPerc += s.percentage;
+            count++;
+        });
+        let avgPerc = count > 0 ? Math.round(overallPerc / count) : 0;
+    %>
+    
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-num" style="color:#00b894;"><%= totalAttended %></div>
+            <div class="stat-label">Classes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:#0984e3;"><%= avgPerc %>%</div>
+            <div class="stat-label">Average</div>
+        </div>
+    </div>
+
+    <!-- Timeline Feed -->
+    <div class="timeline">
+        <% if(history.length === 0) { %>
+            <p style="color:rgba(255,255,255,0.4);">No records yet.</p>
+        <% } %>
+
+        <% history.forEach(record => { %>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="font-weight:600; font-size:1.1rem;"><%= record.title %></span>
+                    <span style="font-size:0.8rem; color:#a29bfe;">Present</span>
+                </div>
+                <div style="font-size:0.85rem; color:rgba(255,255,255,0.5);">
+                    <%= record.date.toLocaleDateString() %> • <%= record.date.toLocaleTimeString() %>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+
+    <a href="/user/dashboard" class="back-fab">Back to Scan</a>
+</div>
+
+</body>
+</html>

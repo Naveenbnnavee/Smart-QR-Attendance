@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Session - QR Attendance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    
+    <style>
+        /* --- THEME & RESET --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #a5b4fc;
+            --accent-cyan: #06b6d4;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #110e28;
+            background-image: radial-gradient(circle at 20% 20%, rgba(79, 70, 229, 0.15) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+                              linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            margin: 0;
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 15px 5%;
+            background: rgba(17, 14, 40, 0.7);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-sizing: border-box;
+        }
+        
+        .logo { font-weight: 700; font-size: 1.4rem; color: #fff; display: flex; align-items: center; gap: 10px; }
+        
+        /* UPDATED: Flexbox to center the SVG icon */
+        .logo-icon { 
+            width: 32px; height: 32px; 
+            background: linear-gradient(135deg, #6366f1, #a855f7); 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+
+        /* --- LAYOUT GRID --- */
+        .session-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- TITLE STYLES --- */
+        .session-title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        h1 { 
+            margin: 0;
+            font-size: 2.2rem; 
+            text-align: center;
+            background: linear-gradient(to right, #fff, #a5b4fc);
+            background-clip: text; 
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .left-panel { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .right-panel { flex: 1; max-width: 450px; }
+
+        /* --- QR BLUR & OVERLAY --- */
+        .qr-wrapper {
+            position: relative;
+            padding: 4px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+            border-radius: 24px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .qr-box { background: white; padding: 20px; border-radius: 20px; display: flex; justify-content: center; align-items: center; transition: filter 0.5s ease; min-width: 300px; min-height: 300px; }
+        .qr-box canvas { display: block; } /* Using Canvas for Dynamic QR instead of static img */
+
+        /* Blur State */
+        .session-inactive .qr-box { filter: blur(15px) grayscale(100%); }
+
+        .status-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10; background: rgba(15, 12, 41, 0.4); border-radius: 24px;
+        }
+
+        .status-badge {
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .badge-expired { background: #ef4444; color: white; }
+        .badge-closed { background: #64748b; color: white; }
+
+        /* --- BEAUTIFIED ACTION BUTTONS --- */
+        .action-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button, .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            min-width: 140px;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+
+        .btn-primary { background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: #ef4444; color: white; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.05); color: #a5b4fc; border: 1px solid var(--glass-border); }
+        .btn-disabled { background: rgba(255, 255, 255, 0.05); color: #666; cursor: not-allowed; border: 1px solid var(--glass-border); }
+        .btn-success { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+
+        /* --- SMS TOGGLE SWITCH --- */
+        .sms-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+        }
+
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-cyan); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* --- ATTENDEES CARD --- */
+        .attendees-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .attendees-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .count-pill { background: rgba(6, 182, 212, 0.15); color: #22d3ee; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(6, 182, 212, 0.3); }
+        .attendees-list { list-style: none; padding: 0; margin: 0; max-height: 500px; overflow-y: auto; }
+        .attendee-item { padding: 15px 25px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); }
+        .attendee-name { font-weight: 500; color: #fff; }
+        .attendee-time { font-family: monospace; color: rgba(255,255,255,0.4); font-size: 0.85rem; }
+
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; align-items: center; }
+            .right-panel { width: 100%; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <path d="M3 14h7v7H3z"></path>
+                </svg>
+            </div> 
+            QR Attendance System
+        </div>
+        <div class="nav-links">
+            <a href="/client/dashboard" style="color: var(--text-secondary); text-decoration:none; margin-right:20px;">Dashboard</a>
+            <a href="/logout" style="padding: 8px 20px; border-radius: 50px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color:#fff; text-decoration:none;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="session-container">
+        <div class="main-layout">
+            <div class="left-panel">
+                
+                <div class="session-title-wrapper">
+                    <h1><%= sessionData.title %></h1>
+                </div>
+
+                <% 
+                    const createdDate = new Date(sessionData.createdAt);
+                    const isSameDay = createdDate.toDateString() === new Date().toDateString();
+                    const isLive = sessionData.isActive && isSameDay;
+                %>
+
+                <div class="qr-wrapper <%= !isLive ? 'session-inactive' : '' %>">
+                    <div class="qr-box">
+                        <canvas id="qrCanvas"></canvas>
+                    </div>
+                    
+                    <% if (!isSameDay) { %>
+                        <div class="status-overlay">
+                            <span class="status-badge badge-expired">Session Expired</span>
+                        </div>
+                    <% } else if (!sessionData.isActive) { %>
+                        <div class="status-overlay">
+                            <span class="status-badge badge-closed">Session Closed</span>
+                        </div>
+                    <% } %>
+                </div>
+
+                <div class="action-group">
+                    <% if(sessionData.isActive) { %>
+                        <button class="btn btn-disabled" disabled>Live Now</button>
+                        <form action="/client/session/<%= sessionData._id %>/stop" method="POST" onsubmit="return confirm('Stop session?');">
+                            <button type="submit" class="btn btn-danger">Stop Session</button>
+                        </form>
+                    <% } else if(isSameDay) { %>
+                        <form action="/client/session/<%= sessionData._id %>/start" method="POST">
+                            <button type="submit" class="btn btn-success">Restart Session</button>
+                        </form>
+                    <% } else { %>
+                        <button class="btn btn-disabled" disabled>Expired</button>
+                    <% } %>
+
+                    <div class="sms-toggle-container">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">SMS Alerts</span>
+                        <label class="switch">
+                            <input type="checkbox" id="smsToggle" <%= sessionData.sendSMS ? 'checked' : '' %> onchange="toggleSMS()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <form action="/client/session/<%= sessionData._id %>/delete" method="POST" onsubmit="return confirm('Delete?');">
+                        <button type="submit" class="btn btn-secondary">Delete</button>
+                    </form>
+                    
+                    <a href="/client/session/<%= sessionData._id %>/download" class="btn btn-primary">Download Report</a>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="attendees-card">
+                    <div class="attendees-header">
+                        <h3 style="margin:0;">Attendance List</h3>
+                        <span class="count-pill"><span id="attendee-count"><%= attendees.length %></span> Scanned</span>
+                    </div>
+                    <ul class="attendees-list" id="attendees-list">
+                        <% if(attendees.length === 0) { %>
+                            <li class="attendee-item" style="justify-content: center; color: rgba(255,255,255,0.3);">Waiting for scans...</li>
+                        <% } %>
+                        <% attendees.forEach(student => { %>
+                            <li class="attendee-item">
+                                <span class="attendee-name"><%= student.username %></span>
+                                <span class="attendee-time"><%= student.scannedAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}) %></span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SECURE DYNAMIC QR LOGIC ---
+        const isSessionLive = "<%= isLive %>" === "true"; 
+        const sessionId = "<%= sessionData._id %>";
+        const secretSalt = "<%= sessionData.secretSalt %>"; 
+        const qrCanvas = document.getElementById('qrCanvas');
+
+        async function generateDynamicQR() {
+            const timestamp = Date.now();
+            const dataToHash = `${sessionId}-${timestamp}-${secretSalt}`;
+            
+            // Generate SHA-256 Hash
+            const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(dataToHash));
+            const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            const qrUrl = `${window.location.origin}/mark-attendance/${sessionId}?t=${timestamp}&hash=${hashHex}`;
+            
+            QRCode.toCanvas(qrCanvas, qrUrl, { width: 300, margin: 2, color: { dark: "#0f0c29", light: "#ffffff" } }, function (error) {
+                if (error) console.error("QR Generation Error:", error);
+            });
+        }
+
+        if (isSessionLive) {
+            // Generate immediately, then refresh every 10 seconds to prevent replay attacks
+            generateDynamicQR();
+            setInterval(generateDynamicQR, 10000);
+
+            // Auto-update attendees list
+            setInterval(() => {
+                fetch(window.location.href)
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        const countEl = document.getElementById('attendee-count');
+                        const listEl = document.getElementById('attendees-list');
+                        
+                        if (countEl && doc.getElementById('attendee-count')) {
+                            countEl.innerText = doc.getElementById('attendee-count').innerText;
+                        }
+                        if (listEl && doc.getElementById('attendees-list')) {
+                            listEl.innerHTML = doc.getElementById('attendees-list').innerHTML;
+                        }
+                    })
+                    .catch(err => console.error('Auto-update failed:', err));
+            }, 3000);
+        }
+
+        // --- SMS TOGGLE LOGIC ---
+        function toggleSMS() {
+            const isChecked = document.getElementById('smsToggle').checked;
+            
+            fetch(`/client/session/<%= sessionData._id %>/toggle-sms`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    document.getElementById('smsToggle').checked = !isChecked; // Revert if failed
+                    alert("Failed to update SMS settings");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('smsToggle').checked = !isChecked; // Revert on error
+            });
+        }
+    </script>
+</body>
+</html>

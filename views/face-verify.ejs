@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Face Verification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://unpkg.com/face-api.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial;
+            background: #f8f8f8;
+        }
+
+        video {
+            width: 100%;
+            max-width: 360px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            padding: 5px 15px;
+        }
+
+        #hint {
+            font-size: 14px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        #loader {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #444;
+        }
+    </style>
+</head>
+
+<body>
+
+<h3>Face Verification</h3>
+<div id="loader">Loading models...</div>
+
+<video id="video" autoplay muted playsinline></video>
+
+<div id="status"></div>
+<div id="hint">Hold your phone steady • Face must be fully visible</div>
+
+<script>
+    const sessionId = "<%= sessionId %>";
+    const deviceId = "<%= deviceId %>";
+</script>
+
+<script src="/js/face-verify.js"></script>
+
+</body>
+</html>

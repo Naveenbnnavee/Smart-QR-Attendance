@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Profile</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: white; margin: 0; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Header */
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .back-btn { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px; color: white; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 5px; transition:0.2s;}
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* Profile Card */
+        .profile-header {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px; padding: 30px; margin-bottom: 25px;
+            display: flex; align-items: center; gap: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .profile-pic {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: 700; overflow: hidden;
+            border: 4px solid rgba(255,255,255,0.1);
+        }
+        .profile-pic img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .profile-info h1 { margin: 0; font-size: 1.8rem; }
+        .profile-info p { margin: 5px 0 0; opacity: 0.6; font-size: 0.9rem; }
+        .status-verified { color: #00b894; font-weight: 600; font-size: 0.8rem; background: rgba(0, 184, 148, 0.1); padding: 2px 8px; border-radius: 10px; margin-top: 5px; display: inline-block;}
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;
+        }
+        .stat-box {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px; border-radius: 16px; text-align: center;
+        }
+        .stat-val { font-size: 1.8rem; font-weight: 700; margin-bottom: 5px; }
+        .stat-lbl { font-size: 0.8rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .perc-high { color: #00b894; }
+        .perc-med { color: #fdcb6e; }
+        .perc-low { color: #ff7675; }
+
+        /* Subject List */
+        .subject-list {
+            background: rgba(255,255,255,0.03); border-radius: 20px; padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .subject-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .subject-item:last-child { border-bottom: none; }
+        
+        .progress-bar-bg {
+            width: 100px; height: 6px; background: rgba(255,255,255,0.1);
+            border-radius: 10px; overflow: hidden; margin-top: 5px;
+        }
+        .progress-fill { height: 100%; border-radius: 10px; }
+
+        @media (max-width: 600px) {
+            .profile-header { flex-direction: column; text-align: center; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-bar">
+        <a href="/client/manage-students" class="back-btn">← Back to Database</a>
+        <div style="font-size:0.9rem; opacity:0.7;">Student ID: <%= student._id.toString().substr(-6) %></div>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-pic">
+            <% if(student.profilePhoto) { %>
+                <img src="<%= student.profilePhoto %>" alt="Profile">
+            <% } else { %>
+                <%= student.username.charAt(0).toUpperCase() %>
+            <% } %>
+        </div>
+        <div class="profile-info">
+            <h1><%= student.username %></h1>
+            <p>Student Account</p>
+            <% if(student.isVerified) { %>
+                <span class="status-verified">● Verified</span>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Key Statistics -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-val <%= overallPercentage >= 75 ? 'perc-high' : (overallPercentage >= 60 ? 'perc-med' : 'perc-low') %>">
+                <%= overallPercentage %>%
+            </div>
+            <div class="stat-lbl">Overall Attendance</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val"><%= attendedClasses %></div>
+            <div class="stat-lbl">Classes Attended</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val"><%= totalClasses %></div>
+            <div class="stat-lbl">Total Classes</div>
+        </div>
+    </div>
+
+    <!-- Subject Breakdown -->
+    <h3 style="margin-bottom: 15px;">Subject Performance</h3>
+    <div class="subject-list">
+        <% if(subjects.length === 0) { %>
+            <p style="text-align:center; opacity:0.5;">No attendance records found.</p>
+        <% } %>
+
+        <% subjects.forEach(sub => { 
+            let color = '#00b894';
+            if(sub.percentage < 75) color = '#fdcb6e';
+            if(sub.percentage < 50) color = '#ff7675';
+        %>
+            <div class="subject-item">
+                <div style="flex:1;">
+                    <div style="font-weight:600; font-size:1rem;"><%= sub.name %></div>
+                    <div style="font-size:0.8rem; opacity:0.5;"><%= sub.attended %> / <%= sub.total %> Classes</div>
+                </div>
+                <div style="text-align:right;">
+                    <!-- Added spaces inside style attribute to help editor parser -->
+                    <div style="font-weight:700; color: <%= color %>"><%= sub.percentage %>%</div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" style="width: <%= sub.percentage %>%; background: <%= color %>;"></div>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+
+</div>
+
+</body>
+</html>

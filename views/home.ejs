@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attendance Portal</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- DESKTOP STYLES (Default) --- */
+        .hero-section {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px 10%;
+            flex-wrap: wrap; 
+            gap: 40px;
+        }
+        .hero-text { max-width: 600px; }
+        .hero-text h1 { 
+            font-size: 3.5rem; line-height: 1.2; margin-bottom: 20px;
+            
+            /* --- FIX STARTS HERE --- */
+            background: linear-gradient(to right, #fff, #a29bfe);
+            /* Standard property added to satisfy VS Code warning */
+            background-clip: text; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            /* --- FIX ENDS HERE --- */
+        }
+        .hero-text p { font-size: 1.1rem; color: rgba(255,255,255,0.7); margin-bottom: 30px; line-height: 1.6; }
+        
+        .cta-btn {
+            background: linear-gradient(135deg, #00d2d3, #0abde3);
+            color: white; padding: 15px 40px; border-radius: 30px;
+            text-decoration: none; font-weight: 600; font-size: 1.1rem;
+            box-shadow: 0 10px 20px rgba(0, 210, 211, 0.3); transition: 0.3s;
+        }
+        .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 210, 211, 0.5); }
+
+        .feature-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px; padding: 50px 10%; background: rgba(0,0,0,0.2);
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1); text-align: center;
+        }
+        .f-icon { font-size: 2rem; margin-bottom: 15px; color: #a29bfe; }
+
+        .login-nav-btn {
+            background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 20px;
+            color: white; text-decoration: none; font-weight: 600; border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.3s;
+        }
+        .login-nav-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* --- MISSING STYLES FOR HOLOGRAPHIC SCANNER --- */
+        .hero-visual-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background: rgba(0, 210, 211, 0.05);
+            border: 1px solid rgba(0, 210, 211, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 210, 211, 0.1);
+            overflow: hidden;
+        }
+
+        /* The Grid Pattern */
+        .qr-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 210, 211, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 210, 211, 0.2) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.5;
+        }
+
+        /* The Moving Line */
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #00d2d3;
+            box-shadow: 0 0 10px #00d2d3, 0 0 20px #00d2d3;
+            animation: scan 3s infinite linear;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Decorative Corners */
+        .corner-bracket {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00d2d3;
+            transition: 0.3s;
+        }
+        .corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        /* Hover Effect */
+        .hero-visual-container:hover .corner-bracket {
+            width: 30px; height: 30px;
+            box-shadow: 0 0 10px rgba(0,210,211,0.5);
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .hero-section {
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+                padding: 40px 5%;
+            }
+
+            .hero-text {
+                max-width: 100%;
+                margin-bottom: 40px;
+            }
+
+            .hero-text h1 {
+                font-size: 2.2rem; /* Smaller font on mobile */
+            }
+
+            .hero-visual-container {
+                width: 260px; /* Slightly smaller on mobile */
+                height: 260px;
+                margin: 0 auto;
+            }
+
+            .top-bar-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .feature-grid {
+                padding: 40px 5%;
+                gap: 20px;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr; /* Stack contact cards */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="background-anim"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="logo-area">
+            <div class="logo-icon">QR</div>
+            <span class="logo-text">QR Attendance</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: center;">
+            <div class="system-status">
+                <div class="status-dot"></div><span>Operational</span>
+            </div>
+            <a href="/login" class="login-nav-btn">Login Portal →</a>
+        </div>
+    </div>
+</div>
+
+<!-- HERO SECTION -->
+<section class="hero-section">
+    <div class="hero-text">
+        <h1>Smart Attendance <br>Made Simple.</h1>
+        <p>
+            Revolutionize your classroom management with our secure, AI-powered system. 
+            Feature-rich tracking with facial verification, geo-fencing, and instant SMS notifications.
+        </p>
+        <a href="/login" class="cta-btn">Get Started</a>
+    </div>
+    
+    <div style="flex:1; display:flex; justify-content:center;">
+        <div class="hero-visual-container">
+            <div class="qr-grid"></div>
+            <div class="scanner-line"></div>
+            <div class="corner-bracket corner-tl"></div>
+            <div class="corner-bracket corner-tr"></div>
+            <div class="corner-bracket corner-bl"></div>
+            <div class="corner-bracket corner-br"></div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="feature-grid">
+    <div class="feature-card">
+        <div class="f-icon">📷</div>
+        <h3>AI Verification</h3>
+        <p style="opacity:0.7;">Prevent proxies with advanced face matching technology during login.</p>
+    </div>
+    <div class="feature-card">
+        <div class="f-icon">📩</div>
+        <h3>SMS Alerts</h3>
+        <p style="opacity:0.7;">Instant notifications sent to students upon marking attendance.</p>
+    </div>
+    <div class="feature-card">
+        <div class="f-icon">📊</div>
+        <h3>Smart Analytics</h3>
+        <p style="opacity:0.7;">Track performance percentages and generate downloadable reports.</p>
+    </div>
+</section>
+
+<!-- CONTACT FOOTER -->
+<footer class="app-footer">
+    <div class="footer-content">
+        <div class="footer-title">Contact Support</div>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <div class="contact-name">Naveen</div>
+                <div class="contact-detail">+91 78927 06982</div>
+                <div class="contact-detail">naveenb.bnbn@gmail.com</div>
+            </div>
+            <div class="contact-card">
+                <div class="contact-name">Nikhil</div>
+                <div class="contact-detail">+91 90198 45586</div>
+                <div class="contact-detail">nikhilcm83@gmail.com</div>
+            </div>
+        </div>
+        
+        <!-- NEW: Copyright Section -->
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; opacity: 0.6;">
+            &copy; 2025 Smart Attendance Portal. Created by Naveen & Nikhil. All Rights Reserved.
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Students</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: white; margin: 0; min-height: 100vh; }
+        
+        /* --- NAVIGATION --- */
+        .top-bar { width: 100%; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 12, 41, 0.95); border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 1000; box-sizing: border-box; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { width: 32px; height: 32px; background: #00d2d3; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; }
+        
+        .sub-nav { background: rgba(255, 255, 255, 0.05); padding: 10px 40px; display: flex; gap: 20px; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .sub-nav a { color: #a29bfe; text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 5px 10px; border-radius: 6px; transition: 0.3s; }
+        .sub-nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+        .sub-nav .active-link { background: rgba(108, 92, 231, 0.3); color: #fff; }
+        .welcome-msg { margin-left: auto; font-size: 0.9rem; color: #fab1a0; font-weight: 600; }
+
+        /* --- CONTENT --- */
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .page-header { margin-bottom: 30px; text-align: center; }
+        .page-header h2 { margin: 0; font-size: 1.8rem; }
+        .page-header p { opacity: 0.6; font-size: 0.9rem; margin-top: 5px; }
+
+        .pending-grid { display: grid; gap: 15px; }
+        .student-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
+        .student-info { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 50px; height: 50px; background: #6c5ce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .actions { display: flex; gap: 10px; }
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .btn-verify { background: #00b894; color: white; }
+        .btn-reject { background: rgba(255, 118, 117, 0.2); color: #ff7675; border: 1px solid rgba(255, 118, 117, 0.3); }
+        .btn:hover { transform: translateY(-2px); }
+
+        .empty-state { text-align: center; opacity: 0.5; padding: 50px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="logo-area">
+        <div class="logo-icon">QR</div>
+        <span style="font-weight: 600; letter-spacing: 0.5px;">Teacher Dashboard</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <span id="liveClock" style="font-family: monospace; color: #00d2d3;"></span>
+        <a href="/logout" style="color: #ff7675; text-decoration:none; font-size:0.9rem;">Logout</a>
+    </div>
+</div>
+
+<div class="sub-nav">
+    <a href="/client/dashboard">Dashboard</a>
+    <a href="/client/verify-students" class="active-link">Verify Students (<%= pendingCount %>)</a>
+    <a href="/client/manage-students">Student Database</a>
+    <a href="/profile">Profile</a>
+    <span class="welcome-msg">Welcome, <%= username %>!</span>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <h2>Verification Requests</h2>
+        <p>Review new student registrations.</p>
+    </div>
+
+    <% if(pendingUsers.length === 0) { %>
+        <div class="empty-state">
+            <h3>No Pending Requests</h3>
+            <p>All students have been processed.</p>
+        </div>
+    <% } else { %>
+        <div class="pending-grid">
+            <% pendingUsers.forEach(user => { %>
+                <div class="student-card">
+                    <div class="student-info">
+                        <div class="avatar">
+                            <% if(user.profilePhoto) { %> <img src="<%= user.profilePhoto %>"> <% } else { %> <%= user.username.charAt(0).toUpperCase() %> <% } %>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 1.1rem;"><%= user.username %></div>
+                            <div style="font-size: 0.85rem; opacity: 0.6;"><%= user.phone || 'No Phone' %> • AI Data: <%= user.faceDescriptor ? 'Yes' : 'No' %></div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <form action="/client/verify/<%= user._id %>" method="POST" style="margin:0;">
+                            <button type="submit" class="btn btn-verify">Verify</button>
+                        </form>
+                        <form action="/client/reject/<%= user._id %>" method="POST" style="margin:0;" onsubmit="return confirm('Reject this student?');">
+                            <button type="submit" class="btn btn-reject">Reject</button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    function updateClock() { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
+    setInterval(updateClock, 1000); updateClock();
+</script>
+
+</body>
+</html>

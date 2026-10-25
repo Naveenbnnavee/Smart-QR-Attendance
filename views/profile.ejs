@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        body { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: white; margin: 0; min-height: 100vh; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .back-btn { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px; color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 20px;}
+        
+        .profile-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 30px; text-align: center; }
+        
+        .profile-img-lg {
+            width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
+            border: 4px solid rgba(255,255,255,0.1); margin: 0 auto 20px;
+            background: #2d3436;
+        }
+        
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-bottom: 5px; display: block; }
+        input { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; outline: none; }
+        
+        .warning-box {
+            background: rgba(255, 159, 67, 0.1); border: 1px solid #ff9f43; color: #ff9f43;
+            padding: 10px; border-radius: 10px; font-size: 0.8rem; margin: 20px 0;
+            display: none; /* Hidden by default */
+        }
+
+        .btn-save { background: #00b894; color: white; width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 1rem; }
+        .btn-save:disabled { background: #636e72; cursor: not-allowed; }
+
+        .upload-label { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; margin-top: -10px; display: inline-block; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <% if(user.role === 'client') { %>
+        <a href="/client/dashboard" class="back-btn">← Dashboard</a>
+    <% } else { %>
+        <a href="/user/dashboard" class="back-btn">← Dashboard</a>
+    <% } %>
+
+    <div class="profile-card">
+        <h1>Edit Profile</h1>
+        
+        <% if(success) { %><div style="color:#00b894; margin-bottom:15px;"><%= success %></div><% } %>
+        <% if(error) { %><div style="color:#ff7675; margin-bottom:15px;"><%= error %></div><% } %>
+
+        <form action="/profile/update" method="POST">
+            
+            <% if(user.role === 'user') { %>
+                <div class="profile-section">
+                    <% if(user.profilePhoto) { %>
+                        <img src="<%= user.profilePhoto %>" class="profile-img-lg" id="imgPreview">
+                    <% } else { %>
+                        <div class="profile-img-lg" id="imgPlaceholder" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">👤</div>
+                        <img src="" class="profile-img-lg" id="imgPreview" style="display:none;">
+                    <% } %>
+                    
+                    <input type="file" id="fileInput" accept="image/*" style="display:none;">
+                    <label for="fileInput" class="upload-label">Change Photo</label>
+                    
+                    <div id="photoWarning" class="warning-box">
+                        ⚠️ Changing your photo will require <strong>Teacher Re-verification</strong>. You will be logged out until approved.
+                    </div>
+                </div>
+            <% } %>
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" value="<%= user.username %>" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" name="phone" value="<%= user.phone || '' %>" placeholder="+91...">
+            </div>
+
+            <div class="form-group">
+                <label>Password (Leave blank to keep current)</label>
+                <input type="text" name="password" value="<%= user.password %>" placeholder="New Password">
+            </div>
+
+            <!-- Hidden Fields for AI Data -->
+            <input type="hidden" name="profilePhoto" id="profilePhoto">
+            <input type="hidden" name="faceDescriptor" id="faceDescriptor">
+
+            <button type="submit" class="btn-save" id="saveBtn">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const imgPreview = document.getElementById('imgPreview');
+    const imgPlaceholder = document.getElementById('imgPlaceholder');
+    const warningBox = document.getElementById('photoWarning');
+    const saveBtn = document.getElementById('saveBtn');
+    const photoField = document.getElementById('profilePhoto');
+    const descField = document.getElementById('faceDescriptor');
+
+    // Only run AI logic if file input exists (Students)
+    if(fileInput) {
+        Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+        ]).then(() => console.log("AI Ready"));
+
+        fileInput.addEventListener('change', async () => {
+            const file = fileInput.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if(imgPlaceholder) imgPlaceholder.style.display = 'none';
+                imgPreview.src = e.target.result;
+                imgPreview.style.display = 'block';
+                photoField.value = e.target.result;
+                
+                // Show Warning
+                warningBox.style.display = 'block';
+                saveBtn.disabled = true;
+                saveBtn.innerText = "Processing Photo...";
+                
+                processFace(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        async function processFace(imageSrc) {
+            try {
+                const img = await faceapi.fetchImage(imageSrc);
+                const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+                
+                if (detection) {
+                    descField.value = JSON.stringify(Array.from(detection.descriptor));
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = "Save Changes";
+                } else {
+                    alert("No face detected in new photo. Please try again.");
+                    saveBtn.innerText = "Invalid Photo";
+                }
+            } catch(e) { console.error(e); }
+        }
+    }
+</script>
+
+</body>
+</html>
