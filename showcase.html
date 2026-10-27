@@ -1,440 +1,659 @@
 <!DOCTYPE html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart QR & Geo-Fenced Verification Engine | Architectural Showcase</title>
-  <meta name="description" content="Enterprise identity and attendance verification platform featuring rotating cryptographic tokens, spatial geo-fencing, and anti-proxy device binding.">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="apple-touch-icon" href="favicon.svg">
-  <link rel="shortcut icon" href="favicon.svg">
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              cyan: '#06b6d4',
-              emerald: '#10b981',
-              indigo: '#6366f1'
-            }
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attendance Portal | Project Portfolio & Architecture</title>
+    <meta name="description" content="AI-powered anti-proxy attendance verification platform featuring facial biometrics, Haversine geo-fencing, 5s dynamic rotating QR codes, and Twilio SMS dispatch.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Portfolio Specific Styling Extensions using Original Theme Variables */
+        .portfolio-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px 80px 20px;
+            width: 100%;
         }
-      }
-    }
-  </script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    .glow-cyan {
-      box-shadow: 0 0 45px -10px rgba(6, 182, 212, 0.4);
-    }
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .glass-panel:hover {
-      border-color: rgba(6, 182, 212, 0.4);
-    }
-    .grid-bg {
-      background-image: radial-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px);
-      background-size: 32px 32px;
-    }
-  </style>
+
+        .hero-section {
+            min-height: 75vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 40px 0 60px 0;
+            flex-wrap: wrap; 
+            gap: 40px;
+        }
+
+        .hero-text { max-width: 620px; }
+        .hero-text h1 { 
+            font-size: 3.4rem; 
+            line-height: 1.15; 
+            margin-bottom: 20px;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, #a29bfe, var(--primary-color));
+            background-clip: text; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-text p { 
+            font-size: 1.08rem; 
+            color: rgba(255, 255, 255, 0.78); 
+            margin-bottom: 25px; 
+            line-height: 1.7; 
+        }
+
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(0, 210, 211, 0.3);
+            font-size: 0.82rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tech-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.85);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Section Headings */
+        .section-header {
+            text-align: center;
+            margin: 60px 0 35px 0;
+        }
+
+        .section-header h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffffff, #a29bfe);
+            background-clip: text; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-header p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.65);
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* Feature Cards Grid */
+        .feature-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px; 
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 32px 28px; 
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            text-align: left;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+        }
+
+        .feature-card:hover { 
+            transform: translateY(-5px); 
+            border-color: rgba(0, 210, 211, 0.4); 
+            background: rgba(255, 255, 255, 0.08); 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .feature-icon-wrapper {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(0, 210, 211, 0.2), rgba(95, 39, 205, 0.2));
+            border: 1px solid rgba(0, 210, 211, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 18px;
+            color: var(--primary-color);
+        }
+
+        .feature-card h3 { 
+            font-size: 1.25rem; 
+            margin-bottom: 10px; 
+            color: #ffffff; 
+            font-weight: 600; 
+        }
+
+        .feature-card p { 
+            font-size: 0.92rem; 
+            color: rgba(255, 255, 255, 0.68); 
+            line-height: 1.65; 
+        }
+
+        /* Metrics Showcase Row */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(95, 39, 205, 0.4);
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .metric-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .metric-desc {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.5;
+        }
+
+        /* CTA & Nav Buttons */
+        .cta-btn {
+            background: linear-gradient(135deg, #00d2d3, #0abde3);
+            color: white; 
+            padding: 16px 42px; 
+            border-radius: 30px;
+            text-decoration: none; 
+            font-weight: 700; 
+            font-size: 1.12rem;
+            box-shadow: 0 10px 25px rgba(0, 210, 211, 0.35); 
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover { 
+            transform: translateY(-3px) scale(1.02); 
+            box-shadow: 0 16px 32px rgba(0, 210, 211, 0.5); 
+        }
+
+        .login-nav-btn {
+            background: rgba(255,255,255,0.08); 
+            padding: 10px 22px; 
+            border-radius: 20px;
+            color: white; 
+            text-decoration: none; 
+            font-weight: 600; 
+            border: 1px solid rgba(255,255,255,0.18);
+            transition: all 0.3s ease;
+            font-size: 0.88rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-nav-btn:hover { 
+            background: rgba(255,255,255,0.18); 
+            border-color: var(--primary-color);
+            color: #ffffff;
+        }
+
+        /* Render Free Tier Wake Button */
+        .wake-server-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(0, 210, 211, 0.35);
+            color: var(--primary-color);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .wake-server-btn:hover {
+            background: rgba(0, 210, 211, 0.15);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        /* FINAL LAUNCH SECTION (At the very bottom of the portfolio page) */
+        .final-launch-section {
+            margin-top: 70px;
+            padding: 55px 35px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(95, 39, 205, 0.25));
+            border: 1px solid rgba(0, 210, 211, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+            backdrop-filter: blur(20px);
+        }
+
+        .final-launch-section h2 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #ffffff, #a29bfe);
+            background-clip: text; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+        }
+
+        .final-launch-section p {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.78);
+            max-width: 680px;
+            margin: 0 auto 35px auto;
+            line-height: 1.7;
+        }
+
+        .final-launch-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Toast notification */
+        #toast {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 10000;
+            background: rgba(15, 12, 41, 0.95);
+            border: 1px solid var(--primary-color);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-size: 0.88rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 0;
+            }
+            .hero-text h1 { font-size: 2.3rem; }
+            .tech-tags { justify-content: center; }
+            .hero-visual-container { margin: 0 auto; }
+            .final-launch-section { padding: 40px 20px; }
+            .final-launch-section h2 { font-size: 1.9rem; }
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-cyan-500/30 selection:text-cyan-200 grid-bg relative overflow-x-hidden font-sans">
+<body>
 
-  <!-- Ambient Light Orbs -->
-  <div class="fixed top-0 right-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
-  <div class="fixed bottom-10 left-10 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+<!-- Original Ambient Particle Animation -->
+<div class="background-anim">
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
 
-  <!-- Navigation Bar -->
-  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-          <img src="favicon.svg" alt="SmartQR Security Shield" class="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]">
+<!-- Authentic Top Bar -->
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="logo-area" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <div class="logo-icon">⚡</div>
+            <span class="logo-text">QR Attendance</span>
         </div>
-        <div>
-          <span class="font-bold tracking-wider text-slate-100">SmartQR</span>
-          <span class="text-xs text-cyan-400 ml-2 font-mono px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-800">ZERO-PROXY</span>
+
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: center;">
+            <div class="system-status">
+                <div class="status-dot"></div>
+                <span id="sys-status-text">Operational</span>
+            </div>
+
+            <!-- Free Tier Render Wake Button -->
+            <button id="wake-btn" onclick="triggerWakeServer()" class="wake-server-btn" title="Ping and awaken sleeping Render container">
+                <span id="wake-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #00d2d3; display: inline-block;"></span>
+                <span id="wake-text">⚡ Wake Server</span>
+            </button>
+
+            <a href="/home" class="login-nav-btn">Launch Portal →</a>
         </div>
-      </div>
-      <div class="flex items-center gap-3 text-sm font-medium">
-        <a href="#metrics" class="text-slate-400 hover:text-cyan-400 transition-colors hidden sm:inline">Metrics</a>
-        <a href="#security" class="text-slate-400 hover:text-cyan-400 transition-colors hidden md:inline">Anti-Proxy Protocol</a>
-        <a href="#quickstart" class="text-slate-400 hover:text-cyan-400 transition-colors hidden sm:inline">Setup</a>
-
-        <!-- Render Free Tier Wake Button & Live Status -->
-        <button id="wake-btn" onclick="triggerWakeServer()" class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs font-mono font-medium flex items-center gap-1.5 transition-all shadow-sm" title="Ping and awaken Render container">
-          <span id="wake-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-          <span id="wake-text">⚡ Wake Server</span>
-        </button>
-
-        <a href="/home" class="px-3.5 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 text-xs font-semibold transition-all flex items-center gap-1.5">
-          <span>Launch Portal</span>
-          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-        </a>
-      </div>
     </div>
-  </header>
+</div>
 
-  <main class="max-w-7xl mx-auto px-6 pt-12 pb-24 space-y-20">
+<main class="portfolio-container">
 
-    <!-- Hero Section -->
-    <section class="text-center max-w-4xl mx-auto space-y-6 pt-8">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/50 border border-cyan-700/50 text-cyan-300 text-xs font-semibold tracking-wide uppercase">
-        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-cyan-400"></i>
-        <span>Full-Stack Security & Enterprise Verification</span>
-      </div>
-
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-        Smart QR & <br />
-        <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-emerald-400 bg-clip-text text-transparent">
-          Geo-Fenced Verification Engine
-        </span>
-      </h1>
-
-      <p class="text-lg text-slate-300 leading-relaxed max-w-3xl mx-auto">
-        Enterprise identity and attendance verification platform eliminating proxy scans via rotating cryptographic nonces, sub-10m Haversine boundary enforcement, and hardware device fingerprint binding.
-      </p>
-
-      <!-- Stack Tags -->
-      <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
-        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="server" class="w-3.5 h-3.5 text-emerald-400"></i> Node.js & Express.js
-        </span>
-        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="database" class="w-3.5 h-3.5 text-green-400"></i> MongoDB & Mongoose
-        </span>
-        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-cyan-400"></i> Dynamic QR Rotation
-        </span>
-        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-red-400"></i> Geo-Fencing APIs
-        </span>
-        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="phone-call" class="w-3.5 h-3.5 text-rose-400"></i> Twilio API
-        </span>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="pt-6 flex flex-wrap items-center justify-center gap-4">
-        <a href="/home" class="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-500 text-slate-950 font-bold text-base hover:from-cyan-400 hover:to-emerald-400 transition-all transform hover:-translate-y-1 shadow-2xl glow-cyan">
-          <i data-lucide="layout-dashboard" class="w-5 h-5 text-slate-950"></i>
-          <span>Launch Attendance Portal</span>
-          <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
-        </a>
-        <a href="/login" class="inline-flex items-center gap-2.5 px-6 py-4 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 font-semibold text-base hover:bg-slate-800 transition-all">
-          <i data-lucide="scan" class="w-5 h-5 text-cyan-400"></i>
-          <span>View Lecturer Scanner Demo</span>
-        </a>
-      </div>
-    </section>
-
-    <!-- Metrics Grid -->
-    <section id="metrics" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-xs font-mono uppercase tracking-wider text-cyan-400">Token Rotation</span>
-          <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
-            <i data-lucide="timer" class="w-4 h-4"></i>
-          </div>
-        </div>
-        <div class="text-3xl font-black text-white font-mono tracking-tight">5s Dynamic Rotation</div>
-        <p class="text-xs text-slate-400 mt-2">Cryptographically signed temporal QR rotation with short TTL neutralizing screenshot sharing.</p>
-        <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-          <div class="h-full bg-cyan-400 w-full rounded-full"></div>
-        </div>
-      </div>
-
-      <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400">Spatial Accuracy</span>
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-            <i data-lucide="map-pin" class="w-4 h-4"></i>
-          </div>
-        </div>
-        <div class="text-3xl font-black text-white font-mono tracking-tight">10-Meter Precision</div>
-        <p class="text-xs text-slate-400 mt-2">Haversine polygon boundary verification enforcing physical presence in lecture hall or room.</p>
-        <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-          <div class="h-full bg-emerald-400 w-11/12 rounded-full"></div>
-        </div>
-      </div>
-
-      <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-xs font-mono uppercase tracking-wider text-sky-400">Hardware Fingerprint</span>
-          <div class="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400">
-            <i data-lucide="smartphone" class="w-4 h-4"></i>
-          </div>
-        </div>
-        <div class="text-3xl font-black text-white font-mono tracking-tight">1:1 Device Binding</div>
-        <p class="text-xs text-slate-400 mt-2">Anti-proxy hardware signature hashing preventing one student from scanning for another.</p>
-        <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-          <div class="h-full bg-sky-400 w-full rounded-full"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Visual Verification Diagram: Anti-Proxy Defenses -->
-    <section id="security" class="space-y-6">
-      <div class="border-b border-slate-800 pb-4">
-        <div class="text-xs font-mono text-cyan-400 uppercase tracking-widest">Multi-Layer Defenses</div>
-        <h2 class="text-2xl font-bold text-white mt-1">Anti-Proxy Triple Validation Protocol</h2>
-      </div>
-
-      <div class="glass-panel p-8 rounded-2xl space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
-              <i data-lucide="clock" class="w-5 h-5"></i>
+    <!-- HERO SECTION: Project Showcase -->
+    <section class="hero-section">
+        <div class="hero-text">
+            <div class="pill-badge">
+                <span>🛡️ Anti-Proxy Verification Architecture</span>
             </div>
-            <h4 class="font-bold text-slate-100">Layer 1: Temporal Token Rotation</h4>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Lecturer screen generates a new signed cryptographic payload every 5 seconds. If a student takes a photo or screenshot and sends it over WhatsApp/Telegram, the token expires before the recipient can scan it.
+
+            <h1>Smart Attendance <br>Verification Engine.</h1>
+
+            <p>
+                A high-integrity attendance enforcement platform combining 
+                <strong style="color: #ffffff;">cryptographic rotating QR codes</strong>, 
+                <strong style="color: #ffffff;">Haversine geo-fencing (sub-10m)</strong>, 
+                <strong style="color: #ffffff;">AI facial biometric verification</strong>, and 
+                <strong style="color: #ffffff;">automated Twilio SMS dispatches</strong> to permanently eliminate proxy check-ins.
             </p>
-          </div>
 
-          <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
-              <i data-lucide="crosshair" class="w-5 h-5"></i>
+            <div class="tech-tags">
+                <span class="tech-tag">⚡ Node.js & Express</span>
+                <span class="tech-tag">🍃 MongoDB & Mongoose</span>
+                <span class="tech-tag">🔄 5s Dynamic QR Rotation</span>
+                <span class="tech-tag">📍 Haversine Geo-Fencing</span>
+                <span class="tech-tag">📷 Face-API Biometrics</span>
+                <span class="tech-tag">📲 Twilio SMS Gateway</span>
             </div>
-            <h4 class="font-bold text-slate-100">Layer 2: Real-Time Geo-Polygon</h4>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Student scan device transmits browser coordinates with GPS timestamp. Server evaluates Haversine distance formula against session bounding box with 10m tolerance. Scanning from a dorm or outside triggers automatic refusal.
-            </p>
-          </div>
-
-          <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold">
-              <i data-lucide="cpu" class="w-5 h-5"></i>
-            </div>
-            <h4 class="font-bold text-slate-100">Layer 3: Hardware Signature Lock</h4>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Enrolls user device hash (screen dimensions, WebGL vendor, canvas signature). Attempts to sign in with another student's account on the same physical smartphone are flagged as proxy impersonation.
-            </p>
-          </div>
         </div>
-      </div>
+
+        <!-- Authentic Holographic Scanner Container -->
+        <div style="flex: 1; display: flex; justify-content: center;">
+            <div class="hero-visual-container">
+                <div class="qr-grid"></div>
+                <div class="scanner-line"></div>
+                <div class="corner-bracket corner-tl"></div>
+                <div class="corner-bracket corner-tr"></div>
+                <div class="corner-bracket corner-bl"></div>
+                <div class="corner-bracket corner-br"></div>
+            </div>
+        </div>
     </section>
 
-    <!-- Quickstart / Execution -->
-    <section id="quickstart" class="space-y-6">
-      <div class="border-b border-slate-800 pb-4">
-        <div class="text-xs font-mono text-cyan-400 uppercase tracking-widest">Local Deployment</div>
-        <h2 class="text-2xl font-bold text-white mt-1">Quickstart & MongoDB Setup</h2>
-      </div>
-
-      <div class="glass-panel rounded-2xl overflow-hidden border border-slate-800">
-        <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
-            <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
-            <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
-            <span class="ml-2 font-mono text-xs text-slate-400">terminal — smart-qr-attendance</span>
-          </div>
-          <span class="text-[11px] font-mono text-slate-500">Node v18+ &bull; MongoDB Atlas</span>
+    <!-- KEY SYSTEM INVARIANTS / METRICS -->
+    <section class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-value">5 Seconds</div>
+            <div class="metric-label">Dynamic QR Rotation</div>
+            <div class="metric-desc">Cryptographic token regenerated every 5s with short TTL, neutralizing screenshot sharing.</div>
         </div>
 
-        <div class="p-6 font-mono text-sm space-y-4 bg-slate-950/95 overflow-x-auto">
-          <div>
-            <span class="text-slate-500"># 1. Clone repository from GitHub &amp; enter project</span>
-            <div class="flex items-center justify-between text-cyan-300 mt-1">
-              <code>git clone https://github.com/Naveenbnnavee/Smart-QR-Attendance.git &amp;&amp; cd Smart-QR-Attendance</code>
-              <button onclick="copyCmd('git clone https://github.com/Naveenbnnavee/Smart-QR-Attendance.git &amp;&amp; cd Smart-QR-Attendance', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy clone command"><i data-lucide="copy" class="w-4 h-4"></i></button>
-            </div>
-            <div class="mt-2 text-xs">
-              <span class="text-slate-500"># Or pull latest changes into your directory if already cloned:</span>
-              <div class="flex items-center justify-between text-cyan-300 mt-1">
-                <code>git pull origin main</code>
-                <button onclick="copyCmd('git pull origin main', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy pull command"><i data-lucide="copy" class="w-4 h-4"></i></button>
-              </div>
-            </div>
-          </div>
-          <div>
-            <span class="text-slate-500"># 2. Install dependencies</span>
-            <div class="flex items-center justify-between text-cyan-300 mt-1">
-              <code>npm install</code>
-              <button onclick="copyCmd('npm install', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy install command"><i data-lucide="copy" class="w-4 h-4"></i></button>
-            </div>
-          </div>
-          <div>
-            <span class="text-slate-500"># 3. Configure environment variables (.env)</span>
-            <div class="flex items-center justify-between text-cyan-300 mt-1">
-              <code>cp .env.example .env</code>
-              <button onclick="copyCmd('cp .env.example .env', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy env command"><i data-lucide="copy" class="w-4 h-4"></i></button>
-            </div>
-          </div>
-          <div>
-            <span class="text-slate-500"># 4. Start local development server</span>
-            <div class="flex items-center justify-between text-emerald-400 mt-1">
-              <code>npm start</code>
-              <button onclick="copyCmd('npm start', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy start command"><i data-lucide="copy" class="w-4 h-4"></i></button>
-            </div>
-          </div>
+        <div class="metric-card">
+            <div class="metric-value">≤ 10m</div>
+            <div class="metric-label">Geo-Fence Boundary</div>
+            <div class="metric-desc">Haversine geodesic computation enforces student physical presence inside the classroom.</div>
         </div>
-      </div>
+
+        <div class="metric-card">
+            <div class="metric-value">1:1 Lock</div>
+            <div class="metric-label">Hardware Device Binding</div>
+            <div class="metric-desc">Anchors each student account to unique client device fingerprint, barring multi-login fraud.</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-value">Zero-Proxy</div>
+            <div class="metric-label">AI Face Verification</div>
+            <div class="metric-desc">Euclidean distance facial descriptor matching blocks proxy attendance attempts.</div>
+        </div>
     </section>
 
-    <!-- FINAL PROJECT LAUNCH SECTION (At last of the portfolio page) -->
-    <section class="pt-8">
-      <div class="glass-panel p-8 sm:p-12 rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-slate-900/90 via-cyan-950/20 to-slate-900/90 text-center space-y-6 relative overflow-hidden shadow-2xl glow-cyan">
-        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 to-emerald-500 p-0.5 mx-auto shadow-lg shadow-cyan-500/30 flex items-center justify-center">
-          <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-            <i data-lucide="scan" class="w-7 h-7 text-cyan-300"></i>
-          </div>
+    <!-- ARCHITECTURAL PILLARS -->
+    <div class="section-header">
+        <h2>Multi-Layer Defense Pipeline</h2>
+        <p>Comprehensive security mechanisms engineered to guarantee authentic, tamper-proof attendance recording.</p>
+    </div>
+
+    <section class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon-wrapper">🔄</div>
+            <h3>Temporal Nonce Rotation</h3>
+            <p>Faculty consoles project dynamic QR codes that refresh every 5 seconds. Each token carries an HMAC signature that is invalidated immediately upon expiration.</p>
         </div>
 
-        <div class="max-w-xl mx-auto space-y-2">
-          <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
-            Experience the Live Attendance Portal
-          </h3>
-          <p class="text-sm text-slate-300">
-            Launch the full-stack system to generate dynamic rotating QR codes from the faculty console, or test student anti-proxy verification.
-          </p>
+        <div class="feature-card">
+            <div class="feature-icon-wrapper">📍</div>
+            <h3>Haversine Spatial Validation</h3>
+            <p>Calculates precise distance between student GPS coordinates and the lecturer hall perimeter, automatically rejecting scans executed outside the permitted radius.</p>
         </div>
 
-        <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
-          <a href="/home" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-500 text-slate-950 font-bold text-base hover:from-cyan-400 hover:to-emerald-400 inline-flex items-center gap-3 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-2xl glow-cyan">
-            <i data-lucide="layout-dashboard" class="w-5 h-5 text-slate-950"></i>
-            <span>Launch Attendance Portal</span>
-            <i data-lucide="arrow-right" class="w-5 h-5"></i>
-          </a>
-          <a href="/login" class="px-6 py-4 rounded-2xl bg-slate-900 border border-slate-700 text-slate-200 font-semibold text-base hover:bg-slate-800 transition-all flex items-center gap-2">
-            <i data-lucide="log-in" class="w-5 h-5 text-cyan-400"></i>
-            <span>Teacher / Student Login</span>
-          </a>
+        <div class="feature-card">
+            <div class="feature-icon-wrapper">📷</div>
+            <h3>Facial Biometric Matching</h3>
+            <p>Integrates Face-API.js neural models to extract 128-dimensional facial embeddings, confirming student identity before marking attendance status.</p>
         </div>
-      </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-wrapper">📱</div>
+            <h3>Device Fingerprint Binding</h3>
+            <p>Hardware characteristics and browser signatures are locked to a single student profile, preventing one phone from submitting attendance for multiple peers.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-wrapper">📩</div>
+            <h3>Real-Time Twilio SMS</h3>
+            <p>Dispatches instantaneous confirmation SMS alerts directly to the registered student/guardian mobile number upon successful verification.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-wrapper">📊</div>
+            <h3>Faculty Analytics & Export</h3>
+            <p>Equips teachers with real-time class attendance dashboards, live verification logs, percentage tracking, and one-click session reports.</p>
+        </div>
     </section>
 
-    <!-- Footer Note -->
-    <footer class="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-      <div>Smart QR & Geo-Fenced Verification Engine &bull; Production Architecture Showcase</div>
-      <div class="font-mono">Node.js &bull; Express &bull; MongoDB &bull; Twilio &bull; Geo-Fencing</div>
-    </footer>
+    <!-- FINAL SECTION: The Project Launch Button (Placed at the very end of the portfolio page) -->
+    <section class="final-launch-section">
+        <h2>Experience the Live Attendance Portal</h2>
+        <p>
+            Ready to test dynamic QR generation, anti-proxy student verification, and faculty management? 
+            Launch the live system below.
+        </p>
+        <div class="final-launch-actions">
+            <a href="/home" class="cta-btn">
+                <span>🚀 Launch Attendance Portal</span>
+                <span style="font-size: 1.3rem;">→</span>
+            </a>
+            <a href="/login" class="login-nav-btn" style="padding: 16px 32px; font-size: 1rem; border-radius: 30px;">
+                <span>Teacher / Student Login</span>
+            </a>
+        </div>
+    </section>
 
-  </main>
+</main>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-12 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900/95 border border-cyan-500/50 text-cyan-300 px-4 py-2.5 rounded-xl shadow-2xl font-mono text-xs flex items-center gap-2 backdrop-blur-md">
-    <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
-    <span id="toast-msg">Copied to clipboard</span>
-  </div>
+<!-- Authentic App Footer -->
+<footer class="app-footer">
+    <div class="footer-content">
+        <div class="footer-title">Contact Support & Authors</div>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <div class="contact-name">Naveen</div>
+                <div class="contact-detail">📞 +91 78927 06982</div>
+                <div class="contact-detail">✉️ naveenb.bnbn@gmail.com</div>
+            </div>
+            <div class="contact-card">
+                <div class="contact-name">Nikhil</div>
+                <div class="contact-detail">📞 +91 90198 45586</div>
+                <div class="contact-detail">✉️ nikhilcm83@gmail.com</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; opacity: 0.6;">
+            &copy; 2025 Smart Attendance Portal. Created by Naveen & Nikhil. All Rights Reserved.
+        </div>
+    </div>
+</footer>
 
-  <script>
-    lucide.createIcons();
+<!-- Toast Container -->
+<div id="toast">
+    <span id="toast-icon">🚀</span>
+    <span id="toast-text">Render container pinged!</span>
+</div>
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toast-msg');
-      if (!toast || !toastMsg) return;
-      toastMsg.innerText = msg;
-      toast.classList.remove('translate-y-12', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-      clearTimeout(window._toastTimeout);
-      window._toastTimeout = setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-12', 'opacity-0');
-      }, 2500);
-    }
-
-    function copyCmd(text, btn) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(() => {});
-      }
-      showToast('Copied: ' + text);
-    }
-
-    // --- Render Free Tier Auto-Ping & Wake Logic ---
+<script>
+    // --- Render Free Tier Auto-Ping & Cross-Origin Host Detection ---
     const RENDER_BASE_URL = 'https://smart-qr-attendance-f0xh.onrender.com';
     const isRenderHost = window.location.hostname.includes('onrender.com') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const targetApiBase = isRenderHost ? '' : RENDER_BASE_URL;
 
     // Update portal launch links if viewed on external showcase (e.g. Vercel)
     if (!isRenderHost) {
-      document.querySelectorAll('a[href^="/home"], a[href^="/login"], a[href^="/register"]').forEach(a => {
-        a.href = RENDER_BASE_URL + a.getAttribute('href');
-      });
+        document.querySelectorAll('a[href^="/home"], a[href^="/login"], a[href^="/register"]').forEach(a => {
+            a.href = RENDER_BASE_URL + a.getAttribute('href');
+        });
     }
 
     let isWaking = false;
     let wakeInterval = null;
     let wakeSeconds = 0;
 
-    async function checkServerHealth(silent = false) {
-      const wakeBtn = document.getElementById('wake-btn');
-      const wakeDot = document.getElementById('wake-dot');
-      const wakeText = document.getElementById('wake-text');
-      if (!wakeBtn) return false;
+    function showToast(text, icon = '🚀') {
+        const toast = document.getElementById('toast');
+        const toastText = document.getElementById('toast-text');
+        const toastIcon = document.getElementById('toast-icon');
+        if (!toast || !toastText) return;
+        toastText.innerText = text;
+        toastIcon.innerText = icon;
+        toast.classList.add('active');
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => {
+            toast.classList.remove('active');
+        }, 3500);
+    }
 
-      try {
-        const res = await fetch(`${targetApiBase}/health`, { signal: AbortSignal.timeout(4000) });
-        if (res.ok) {
-          if (wakeInterval) clearInterval(wakeInterval);
-          isWaking = false;
-          wakeBtn.className = 'px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-medium flex items-center gap-1.5 cursor-default shadow-sm';
-          wakeDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
-          wakeText.innerText = '● Server Online';
-          wakeBtn.onclick = null;
-          if (!silent) showToast('Render container is online and active! 🚀');
-          return true;
+    async function checkServerHealth(silent = false) {
+        const wakeBtn = document.getElementById('wake-btn');
+        const wakeDot = document.getElementById('wake-dot');
+        const wakeText = document.getElementById('wake-text');
+        const sysText = document.getElementById('sys-status-text');
+        if (!wakeBtn) return false;
+
+        try {
+            const res = await fetch(`${targetApiBase}/health`, { signal: AbortSignal.timeout(4000) });
+            if (res.ok) {
+                if (wakeInterval) clearInterval(wakeInterval);
+                isWaking = false;
+                wakeBtn.style.borderColor = 'rgba(0, 184, 148, 0.4)';
+                wakeBtn.style.color = '#00b894';
+                wakeBtn.style.cursor = 'default';
+                if (wakeDot) wakeDot.style.background = '#00b894';
+                if (wakeText) wakeText.innerText = '● Server Online';
+                if (sysText) sysText.innerText = 'Operational';
+                wakeBtn.onclick = null;
+                if (!silent) showToast('Render container is online and active! 🚀', '✅');
+                return true;
+            }
+        } catch (e) {
+            if (!isWaking) {
+                wakeBtn.style.borderColor = 'rgba(0, 210, 211, 0.35)';
+                wakeBtn.style.color = '#00d2d3';
+                wakeBtn.style.cursor = 'pointer';
+                if (wakeDot) wakeDot.style.background = '#00d2d3';
+                if (wakeText) wakeText.innerText = '⚡ Wake Server';
+                if (sysText) sysText.innerText = 'Sleeping (Free Tier)';
+                wakeBtn.onclick = triggerWakeServer;
+            }
         }
-      } catch (e) {
-        if (!isWaking) {
-          wakeBtn.className = 'px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs font-mono font-medium flex items-center gap-1.5 transition-all shadow-sm';
-          wakeDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
-          wakeText.innerText = '⚡ Wake Server';
-          wakeBtn.onclick = triggerWakeServer;
-        }
-      }
-      return false;
+        return false;
     }
 
     function triggerWakeServer() {
-      if (isWaking) return;
-      isWaking = true;
-      wakeSeconds = 0;
+        if (isWaking) return;
+        isWaking = true;
+        wakeSeconds = 0;
 
-      const wakeBtn = document.getElementById('wake-btn');
-      const wakeDot = document.getElementById('wake-dot');
-      const wakeText = document.getElementById('wake-text');
+        const wakeBtn = document.getElementById('wake-btn');
+        const wakeDot = document.getElementById('wake-dot');
+        const wakeText = document.getElementById('wake-text');
+        const sysText = document.getElementById('sys-status-text');
 
-      wakeBtn.className = 'px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono font-medium flex items-center gap-1.5 cursor-wait shadow-sm';
-      wakeDot.className = 'w-2 h-2 rounded-full bg-cyan-400 animate-ping';
-      wakeText.innerText = 'Waking... (0s)';
-
-      showToast('Waking up Render container from cold sleep (~30-45s)...');
-
-      // Immediate ping
-      fetch(`${targetApiBase}/health`).catch(() => {});
-
-      wakeInterval = setInterval(async () => {
-        wakeSeconds += 2;
-        wakeText.innerText = `Waking... (${wakeSeconds}s)`;
-        const alive = await checkServerHealth(true);
-        if (alive) {
-          clearInterval(wakeInterval);
-          showToast('Render container is awake and operational! 🎉');
+        if (wakeBtn) {
+            wakeBtn.style.borderColor = 'rgba(255, 177, 66, 0.5)';
+            wakeBtn.style.color = '#ffb142';
+            wakeBtn.style.cursor = 'wait';
         }
-        if (wakeSeconds > 90) {
-          clearInterval(wakeInterval);
-          isWaking = false;
-          wakeText.innerText = 'Retry Wake';
-        }
-      }, 2000);
+        if (wakeDot) wakeDot.style.background = '#ffb142';
+        if (wakeText) wakeText.innerText = 'Waking... (0s)';
+        if (sysText) sysText.innerText = 'Waking Container...';
+
+        showToast('Spinning up Render container from cold sleep (~30-45s)...', '⚡');
+
+        // Immediate health ping
+        fetch(`${targetApiBase}/health`).catch(() => {});
+
+        wakeInterval = setInterval(async () => {
+            wakeSeconds += 2;
+            if (wakeText) wakeText.innerText = `Waking... (${wakeSeconds}s)`;
+            const alive = await checkServerHealth(true);
+            if (alive) {
+                clearInterval(wakeInterval);
+                showToast('Render container is awake and operational! 🎉', '🚀');
+            }
+            if (wakeSeconds > 90) {
+                clearInterval(wakeInterval);
+                isWaking = false;
+                if (wakeText) wakeText.innerText = 'Retry Wake';
+            }
+        }, 2000);
     }
 
-    // Initial silent check
+    // Silent background poll
     checkServerHealth(true);
     setInterval(() => { if (!isWaking) checkServerHealth(true); }, 30000);
-  </script>
+</script>
 </body>
 </html>
