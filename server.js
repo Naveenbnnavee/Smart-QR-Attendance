@@ -169,10 +169,16 @@ async function sendSMS(phone, name, status, sessionTitle) {
 
 // --- ROUTES ---
 
-app.get('/', (req, res) => res.render('home'));
+// Root route serves the Project Portfolio Showcase
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// /home route serves the Attendance Portal Homepage
+app.get('/home', (req, res) => res.render('home'));
 app.get('/login', (req, res) => res.render('login', { error: req.query.error, success: req.query.success }));
 app.get('/logout', (req, res) => {
-    req.session.destroy(() => res.redirect('/'));
+    req.session.destroy(() => res.redirect('/home'));
 });
 
 app.get('/register', (req, res) => res.render('register', { error: null }));
