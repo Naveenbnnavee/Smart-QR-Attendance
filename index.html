@@ -234,16 +234,39 @@
 
         <div class="p-6 font-mono text-sm space-y-4 bg-slate-950/95 overflow-x-auto">
           <div>
-            <span class="text-slate-500"># 1. Install dependencies</span>
-            <div class="text-cyan-300 mt-1"><code>npm install</code></div>
+            <span class="text-slate-500"># 1. Clone repository from GitHub &amp; enter project</span>
+            <div class="flex items-center justify-between text-cyan-300 mt-1">
+              <code>git clone https://github.com/Naveenbnnavee/Smart-QR-Attendance.git &amp;&amp; cd Smart-QR-Attendance</code>
+              <button onclick="copyCmd('git clone https://github.com/Naveenbnnavee/Smart-QR-Attendance.git &amp;&amp; cd Smart-QR-Attendance', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy clone command"><i data-lucide="copy" class="w-4 h-4"></i></button>
+            </div>
+            <div class="mt-2 text-xs">
+              <span class="text-slate-500"># Or pull latest changes into your directory if already cloned:</span>
+              <div class="flex items-center justify-between text-cyan-300 mt-1">
+                <code>git pull origin main</code>
+                <button onclick="copyCmd('git pull origin main', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy pull command"><i data-lucide="copy" class="w-4 h-4"></i></button>
+              </div>
+            </div>
           </div>
           <div>
-            <span class="text-slate-500"># 2. Configure MongoDB in .env</span>
-            <div class="text-cyan-300 mt-1"><code>MONGO_URI=mongodb+srv://... PORT=3000</code></div>
+            <span class="text-slate-500"># 2. Install dependencies</span>
+            <div class="flex items-center justify-between text-cyan-300 mt-1">
+              <code>npm install</code>
+              <button onclick="copyCmd('npm install', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy install command"><i data-lucide="copy" class="w-4 h-4"></i></button>
+            </div>
           </div>
           <div>
-            <span class="text-slate-500"># 3. Start server</span>
-            <div class="text-emerald-400 mt-1"><code>npm start</code></div>
+            <span class="text-slate-500"># 3. Configure environment variables (.env)</span>
+            <div class="flex items-center justify-between text-cyan-300 mt-1">
+              <code>cp .env.example .env</code>
+              <button onclick="copyCmd('cp .env.example .env', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy env command"><i data-lucide="copy" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+          <div>
+            <span class="text-slate-500"># 4. Start local development server</span>
+            <div class="flex items-center justify-between text-emerald-400 mt-1">
+              <code>npm start</code>
+              <button onclick="copyCmd('npm start', this)" class="text-xs text-slate-500 hover:text-cyan-400 p-1 rounded" title="Copy start command"><i data-lucide="copy" class="w-4 h-4"></i></button>
+            </div>
           </div>
         </div>
       </div>
@@ -257,8 +280,35 @@
 
   </main>
 
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-12 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900/95 border border-cyan-500/50 text-cyan-300 px-4 py-2.5 rounded-xl shadow-2xl font-mono text-xs flex items-center gap-2 backdrop-blur-md">
+    <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toast-msg">Copied to clipboard</span>
+  </div>
+
   <script>
     lucide.createIcons();
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      if (!toast || !toastMsg) return;
+      toastMsg.innerText = msg;
+      toast.classList.remove('translate-y-12', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      clearTimeout(window._toastTimeout);
+      window._toastTimeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-12', 'opacity-0');
+      }, 2500);
+    }
+
+    function copyCmd(text, btn) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+      showToast('Copied: ' + text);
+    }
   </script>
 </body>
 </html>
