@@ -8,18 +8,24 @@ const path = require('path');
 const Twilio = require('twilio'); 
 const crypto = require('crypto');
 
+const cors = require('cors');
+
 const app = express();
 
 // --- CONFIGURATION ---
 const PORT = process.env.PORT || 3000;
-const adminSecret = process.env.ADMIN_SECRET; 
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'admin123'; 
 
-// Database Connection
+// Database Connection with graceful timeout
 const mongoURI = process.env.MONGO_URI;
 
-mongoose.connect(mongoURI)
-    .then(() => console.log("✅ MongoDB Connected"))
-    .catch(err => console.log("❌ MongoDB Error:", err));
+if (mongoURI && mongoURI.trim()) {
+    mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 })
+        .then(() => console.log("✅ MongoDB Connected"))
+        .catch(err => console.error("⚠️ MongoDB Connection Warning (Check MONGO_URI in dashboard):", err.message));
+} else {
+    console.warn("⚠️ MONGO_URI environment variable not configured. Set MONGO_URI in Render dashboard for persistent MongoDB storage.");
+}
 
 // Returns distance (lower = more similar). < 0.5 usually means same person.
 function getEuclideanDistance(face1, face2) {
@@ -42,17 +48,39 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
     
 // --- MIDDLEWARE ---
+app.use(cors({
+    origin: (origin, callback) => callback(null, true),
+    credentials: true
+}));
 app.set('view engine', 'ejs');
 app.use(express.static('public')); 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(session({
-    secret: 'secret-key-super-secure', 
+    secret: process.env.SESSION_SECRET || 'secret-key-super-secure-default', 
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 24 * 60 * 60 * 1000 } 
 }));
+
+// --- HEALTH CHECK & ARCHITECTURAL BLUEPRINT ROUTES ---
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        service: 'smart-qr-attendance',
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        timestamp: new Date().toISOString()
+    });
+});
+
+app.get('/showcase', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/blueprint', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
