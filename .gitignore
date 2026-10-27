@@ -12,6 +12,7 @@ node_modules/
 # Build and runtime outputs
 dist/
 build/
+public/index.html
 *.log
 
 # System & IDE

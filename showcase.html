@@ -354,6 +354,17 @@
     }
 
     // --- Render Free Tier Auto-Ping & Wake Logic ---
+    const RENDER_BASE_URL = 'https://smart-qr-attendance-f0xh.onrender.com';
+    const isRenderHost = window.location.hostname.includes('onrender.com') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const targetApiBase = isRenderHost ? '' : RENDER_BASE_URL;
+
+    // Update portal launch links if viewed on external showcase (e.g. Vercel)
+    if (!isRenderHost) {
+      document.querySelectorAll('a[href^="/home"], a[href^="/login"], a[href^="/register"]').forEach(a => {
+        a.href = RENDER_BASE_URL + a.getAttribute('href');
+      });
+    }
+
     let isWaking = false;
     let wakeInterval = null;
     let wakeSeconds = 0;
@@ -365,7 +376,7 @@
       if (!wakeBtn) return false;
 
       try {
-        const res = await fetch('/health', { signal: AbortSignal.timeout(4000) });
+        const res = await fetch(`${targetApiBase}/health`, { signal: AbortSignal.timeout(4000) });
         if (res.ok) {
           if (wakeInterval) clearInterval(wakeInterval);
           isWaking = false;
@@ -403,7 +414,7 @@
       showToast('Waking up Render container from cold sleep (~30-45s)...');
 
       // Immediate ping
-      fetch('/health').catch(() => {});
+      fetch(`${targetApiBase}/health`).catch(() => {});
 
       wakeInterval = setInterval(async () => {
         wakeSeconds += 2;
