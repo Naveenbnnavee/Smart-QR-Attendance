@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart QR & Geo-Fenced Verification Engine | Architectural Showcase</title>
+  <meta name="description" content="Enterprise identity and attendance verification platform featuring rotating cryptographic tokens, spatial geo-fencing, and anti-proxy device binding.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  <link rel="shortcut icon" href="favicon.svg">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cyan: '#06b6d4',
+              emerald: '#10b981',
+              indigo: '#6366f1'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .glow-cyan {
+      box-shadow: 0 0 45px -10px rgba(6, 182, 212, 0.4);
+    }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-panel:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+    .grid-bg {
+      background-image: radial-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-cyan-500/30 selection:text-cyan-200 grid-bg relative overflow-x-hidden font-sans">
+
+  <!-- Ambient Light Orbs -->
+  <div class="fixed top-0 right-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+  <div class="fixed bottom-10 left-10 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+
+  <!-- Navigation Bar -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+          <img src="favicon.svg" alt="SmartQR Security Shield" class="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]">
+        </div>
+        <div>
+          <span class="font-bold tracking-wider text-slate-100">SmartQR</span>
+          <span class="text-xs text-cyan-400 ml-2 font-mono px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-800">ZERO-PROXY</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-sm font-medium">
+        <a href="#metrics" class="text-slate-400 hover:text-cyan-400 transition-colors">Metrics</a>
+        <a href="#security" class="text-slate-400 hover:text-cyan-400 transition-colors">Anti-Proxy Protocol</a>
+        <a href="#quickstart" class="text-slate-400 hover:text-cyan-400 transition-colors">Setup</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 pt-12 pb-24 space-y-20">
+
+    <!-- Hero Section -->
+    <section class="text-center max-w-4xl mx-auto space-y-6 pt-8">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/50 border border-cyan-700/50 text-cyan-300 text-xs font-semibold tracking-wide uppercase">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <span>Full-Stack Security & Enterprise Verification</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+        Smart QR & <br />
+        <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-emerald-400 bg-clip-text text-transparent">
+          Geo-Fenced Verification Engine
+        </span>
+      </h1>
+
+      <p class="text-lg text-slate-300 leading-relaxed max-w-3xl mx-auto">
+        Enterprise identity and attendance verification platform eliminating proxy scans via rotating cryptographic nonces, sub-10m Haversine boundary enforcement, and hardware device fingerprint binding.
+      </p>
+
+      <!-- Stack Tags -->
+      <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
+        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
+          <i data-lucide="server" class="w-3.5 h-3.5 text-emerald-400"></i> Node.js & Express.js
+        </span>
+        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
+          <i data-lucide="database" class="w-3.5 h-3.5 text-green-400"></i> MongoDB & Mongoose
+        </span>
+        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-cyan-400"></i> Dynamic QR Rotation
+        </span>
+        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-red-400"></i> Geo-Fencing APIs
+        </span>
+        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5">
+          <i data-lucide="phone-call" class="w-3.5 h-3.5 text-rose-400"></i> Twilio API
+        </span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-6 flex flex-wrap items-center justify-center gap-4">
+        <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-500 text-slate-950 font-bold text-base hover:from-cyan-400 hover:to-emerald-400 transition-all transform hover:-translate-y-1 shadow-2xl glow-cyan">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 text-slate-950"></i>
+          <span>Launch Attendance Portal</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+        </a>
+        <a href="http://localhost:3000/login" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 px-6 py-4 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 font-semibold text-base hover:bg-slate-800 transition-all">
+          <i data-lucide="scan" class="w-5 h-5 text-cyan-400"></i>
+          <span>View Lecturer Scanner Demo</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Metrics Grid -->
+    <section id="metrics" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-mono uppercase tracking-wider text-cyan-400">Token Rotation</span>
+          <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+            <i data-lucide="timer" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="text-3xl font-black text-white font-mono tracking-tight">5s Dynamic Rotation</div>
+        <p class="text-xs text-slate-400 mt-2">Cryptographically signed temporal QR rotation with short TTL neutralizing screenshot sharing.</p>
+        <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div class="h-full bg-cyan-400 w-full rounded-full"></div>
+        </div>
+      </div>
+
+      <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400">Spatial Accuracy</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+            <i data-lucide="map-pin" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="text-3xl font-black text-white font-mono tracking-tight">10-Meter Precision</div>
+        <p class="text-xs text-slate-400 mt-2">Haversine polygon boundary verification enforcing physical presence in lecture hall or room.</p>
+        <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div class="h-full bg-emerald-400 w-11/12 rounded-full"></div>
+        </div>
+      </div>
+
+      <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-mono uppercase tracking-wider text-sky-400">Hardware Fingerprint</span>
+          <div class="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400">
+            <i data-lucide="smartphone" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="text-3xl font-black text-white font-mono tracking-tight">1:1 Device Binding</div>
+        <p class="text-xs text-slate-400 mt-2">Anti-proxy hardware signature hashing preventing one student from scanning for another.</p>
+        <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div class="h-full bg-sky-400 w-full rounded-full"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visual Verification Diagram: Anti-Proxy Defenses -->
+    <section id="security" class="space-y-6">
+      <div class="border-b border-slate-800 pb-4">
+        <div class="text-xs font-mono text-cyan-400 uppercase tracking-widest">Multi-Layer Defenses</div>
+        <h2 class="text-2xl font-bold text-white mt-1">Anti-Proxy Triple Validation Protocol</h2>
+      </div>
+
+      <div class="glass-panel p-8 rounded-2xl space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+            </div>
+            <h4 class="font-bold text-slate-100">Layer 1: Temporal Token Rotation</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Lecturer screen generates a new signed cryptographic payload every 5 seconds. If a student takes a photo or screenshot and sends it over WhatsApp/Telegram, the token expires before the recipient can scan it.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
+              <i data-lucide="crosshair" class="w-5 h-5"></i>
+            </div>
+            <h4 class="font-bold text-slate-100">Layer 2: Real-Time Geo-Polygon</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Student scan device transmits browser coordinates with GPS timestamp. Server evaluates Haversine distance formula against session bounding box with 10m tolerance. Scanning from a dorm or outside triggers automatic refusal.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold">
+              <i data-lucide="cpu" class="w-5 h-5"></i>
+            </div>
+            <h4 class="font-bold text-slate-100">Layer 3: Hardware Signature Lock</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Enrolls user device hash (screen dimensions, WebGL vendor, canvas signature). Attempts to sign in with another student's account on the same physical smartphone are flagged as proxy impersonation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quickstart / Execution -->
+    <section id="quickstart" class="space-y-6">
+      <div class="border-b border-slate-800 pb-4">
+        <div class="text-xs font-mono text-cyan-400 uppercase tracking-widest">Local Deployment</div>
+        <h2 class="text-2xl font-bold text-white mt-1">Quickstart & MongoDB Setup</h2>
+      </div>
+
+      <div class="glass-panel rounded-2xl overflow-hidden border border-slate-800">
+        <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
+            <span class="ml-2 font-mono text-xs text-slate-400">terminal — smart-qr-attendance</span>
+          </div>
+          <span class="text-[11px] font-mono text-slate-500">Node v18+ &bull; MongoDB Atlas</span>
+        </div>
+
+        <div class="p-6 font-mono text-sm space-y-4 bg-slate-950/95 overflow-x-auto">
+          <div>
+            <span class="text-slate-500"># 1. Install dependencies</span>
+            <div class="text-cyan-300 mt-1"><code>npm install</code></div>
+          </div>
+          <div>
+            <span class="text-slate-500"># 2. Configure MongoDB in .env</span>
+            <div class="text-cyan-300 mt-1"><code>MONGO_URI=mongodb+srv://... PORT=3000</code></div>
+          </div>
+          <div>
+            <span class="text-slate-500"># 3. Start server</span>
+            <div class="text-emerald-400 mt-1"><code>npm start</code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Note -->
+    <footer class="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+      <div>Smart QR & Geo-Fenced Verification Engine &bull; Production Architecture Showcase</div>
+      <div class="font-mono">Node.js &bull; Express &bull; MongoDB &bull; Twilio &bull; Geo-Fencing</div>
+    </footer>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
