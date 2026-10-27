@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart QR & Geo-Fenced Verification Engine | Architectural Blueprint</title>
+  <meta name="description" content="Enterprise identity and attendance verification platform featuring rotating cryptographic tokens, spatial geo-fencing, and anti-proxy device binding.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  
+  <!-- Modern Typography (Inter & JetBrains Mono) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    body {
+      background-color: #09090b;
+      color: #f4f4f5;
+    }
+    .linear-panel {
+      background-color: #121316;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .linear-card {
+      background-color: #16171a;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .linear-card:hover {
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+    .subtle-grid {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen subtle-grid flex flex-col font-sans selection:bg-zinc-800 selection:text-white">
+
+  <!-- Top Application Header - Linear Minimalist Style -->
+  <header class="sticky top-0 z-40 border-b border-white/[0.08] bg-[#09090b]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+      <!-- Logo & Brand -->
+      <a href="#" class="flex items-center gap-2.5 cursor-pointer select-none">
+        <div class="w-8 h-8 rounded-lg bg-[#16171a] border border-white/10 flex items-center justify-center text-zinc-200">
+          <i data-lucide="shield-check" class="w-4 h-4 text-zinc-300"></i>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-sm tracking-tight text-white">SmartQR Engine</span>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
+            v1.0
+          </span>
+        </div>
+      </a>
+
+      <!-- Mode Switcher Tabs -->
+      <nav class="flex items-center bg-[#121316] p-1 rounded-lg border border-white/[0.08]">
+        <button id="tab-btn-overview" onclick="switchView('overview')" class="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all bg-zinc-800 text-white shadow-sm">
+          <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+          <span>Architecture & Invariants</span>
+        </button>
+        <button id="tab-btn-portal" onclick="switchView('portal')" class="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all text-zinc-400 hover:text-zinc-200">
+          <i data-lucide="scan" class="w-3.5 h-3.5"></i>
+          <span>Live Portal Gateway</span>
+        </button>
+      </nav>
+
+      <!-- Backend Status & Settings -->
+      <div class="flex items-center gap-2.5">
+        <!-- Live Health Badge -->
+        <div id="backend-health-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border bg-zinc-900/80 text-amber-400 border-amber-500/20" title="Checking API status...">
+          <span id="backend-health-dot" class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+          <span id="backend-health-text" class="text-[11px]">Connecting</span>
+        </div>
+
+        <!-- Settings Cog -->
+        <button onclick="toggleSettingsModal(true)" class="p-1.5 rounded-md bg-[#121316] border border-white/[0.08] text-zinc-400 hover:text-zinc-100 hover:border-white/20 transition-colors" title="Configure Backend URL">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VIEW 1: ARCHITECTURAL BLUEPRINT & HOW IT WORKS -->
+  <main id="view-overview" class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-12 space-y-12">
+    <!-- Hero Section -->
+    <section class="space-y-4 pt-2">
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#121316] border border-white/[0.08] text-zinc-400 text-xs font-mono">
+        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-zinc-300"></i>
+        <span>ZERO-TRUST ATTENDANCE // CRYPTOGRAPHIC ANTI-PROXY ENGINE</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl font-semibold text-white tracking-tight leading-tight">
+        Smart QR & Geo-Fenced Verification Engine
+      </h1>
+
+      <p class="text-zinc-400 text-base leading-relaxed max-w-3xl">
+        An enterprise identity and physical presence verification platform. Completely neutralizes proxy attendance, 
+        screenshot delegation, and location spoofing using <strong class="text-zinc-200 font-medium">5-second temporal token rotation</strong>, 
+        <strong class="text-zinc-200 font-medium">sub-10m Haversine geo-fencing</strong>, and <strong class="text-zinc-200 font-medium">1:1 hardware canvas fingerprinting</strong>.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-3 pt-2">
+        <a id="hero-portal-btn" href="#" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-lg bg-zinc-100 text-zinc-950 font-medium text-xs hover:bg-white transition-colors inline-flex items-center gap-2">
+          <span>Launch Attendance Portal</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+        <a href="#anti-proxy-protocol" class="px-4 py-2.5 rounded-lg bg-[#121316] border border-white/[0.08] text-zinc-300 font-medium text-xs hover:text-white hover:border-white/20 transition-colors inline-flex items-center gap-2">
+          <span>View Verification Protocol</span>
+        </a>
+        <a href="https://github.com/Naveenbnnavee/Smart-QR-Attendance" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-lg bg-[#121316] border border-white/[0.08] text-zinc-300 font-medium text-xs hover:text-white hover:border-white/20 transition-colors inline-flex items-center gap-2">
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-zinc-400"></i>
+          <span>GitHub Repository</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Key Metrics / System Invariants -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="linear-panel p-5 rounded-xl">
+        <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+          <i data-lucide="timer" class="w-3.5 h-3.5 text-zinc-300"></i> Token TTL
+        </div>
+        <div class="text-2xl font-semibold text-white font-mono tracking-tight">5 Seconds</div>
+        <p class="text-xs text-zinc-500 mt-2">Dynamic signed nonces invalidate before screenshot sharing is possible.</p>
+      </div>
+
+      <div class="linear-panel p-5 rounded-xl">
+        <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-zinc-300"></i> Spatial Bound
+        </div>
+        <div class="text-2xl font-semibold text-white font-mono tracking-tight">&lt; 10 Meters</div>
+        <p class="text-xs text-zinc-500 mt-2">Haversine polygon distance validation enforces physical hall presence.</p>
+      </div>
+
+      <div class="linear-panel p-5 rounded-xl">
+        <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5 text-zinc-300"></i> Hardware Lock
+        </div>
+        <div class="text-2xl font-semibold text-white font-mono tracking-tight">1:1 Binding</div>
+        <p class="text-xs text-zinc-500 mt-2">Canvas & WebGL hash binds 1 physical device to 1 student account.</p>
+      </div>
+
+      <div class="linear-panel p-5 rounded-xl">
+        <div class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-zinc-300"></i> Verification Loop
+        </div>
+        <div class="text-2xl font-semibold text-white font-mono tracking-tight">&lt; 85ms</div>
+        <p class="text-xs text-zinc-500 mt-2">Sub-100ms atomic verification write with Twilio alert dispatch.</p>
+      </div>
+    </section>
+
+    <!-- Visual Architecture & Anti-Proxy Defenses -->
+    <section id="anti-proxy-protocol" class="space-y-4 pt-4">
+      <div class="border-b border-white/[0.08] pb-3 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Protocol Specification</div>
+          <h2 class="text-xl font-semibold text-white mt-1">Triple-Layer Anti-Proxy Pipeline</h2>
+        </div>
+        <span class="text-xs font-mono text-zinc-500">Atomic Validation</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="linear-card p-5 rounded-xl space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono text-zinc-500">DEFENSE LAYER 01</span>
+            <i data-lucide="clock" class="w-4 h-4 text-zinc-400"></i>
+          </div>
+          <h3 class="text-sm font-semibold text-white">Temporal Nonce Rotation</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            The lecturer's screen regenerates a cryptographically signed HMAC token every 5 seconds. If an absent student receives a photo or screenshot via WhatsApp or Telegram, the token has already expired before the scan completes.
+          </p>
+        </div>
+
+        <div class="linear-card p-5 rounded-xl space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono text-zinc-500">DEFENSE LAYER 02</span>
+            <i data-lucide="crosshair" class="w-4 h-4 text-zinc-400"></i>
+          </div>
+          <h3 class="text-sm font-semibold text-white">Haversine Spatial Bounding</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            The scanner client transmits high-accuracy browser GPS coordinates. The server evaluates the spherical distance between the active lecture hall coordinates and student coordinates with a strict 10-meter boundary threshold.
+          </p>
+        </div>
+
+        <div class="linear-card p-5 rounded-xl space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono text-zinc-500">DEFENSE LAYER 03</span>
+            <i data-lucide="cpu" class="w-4 h-4 text-zinc-400"></i>
+          </div>
+          <h3 class="text-sm font-semibold text-white">Hardware Fingerprint Lock</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            On first enrollment, a unique client fingerprint (WebGL GPU string, screen depth, canvas render hash) is locked to the student profile. Attempting to scan for a classmate on the same phone is automatically rejected.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Subsystem Invariants Table -->
+    <section class="space-y-4">
+      <div class="border-b border-white/[0.08] pb-3">
+        <div class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Engineering Invariants</div>
+        <h3 class="text-lg font-semibold text-white mt-1">Component Design Decisions</h3>
+      </div>
+
+      <div class="linear-panel rounded-xl overflow-hidden border border-white/[0.08]">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-[#16171a] border-b border-white/[0.08] text-zinc-400 font-mono">
+            <tr>
+              <th className="py-2.5 px-4 font-medium">Subsystem</th>
+              <th className="py-2.5 px-4 font-medium">Implementation</th>
+              <th className="py-2.5 px-4 font-medium hidden sm:table-cell">Security Invariant</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="py-3 px-4 font-medium text-white flex items-center gap-2">
+                <i data-lucide="server" class="w-3.5 h-3.5 text-zinc-400"></i>
+                <span>API Runtime</span>
+              </td>
+              <td class="py-3 px-4 font-mono text-zinc-400">Express.js 5 + Node.js 18</td>
+              <td class="py-3 px-4 text-zinc-400 hidden sm:table-cell">Sub-millisecond route dispatch with CORS security headers and session isolation.</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-white flex items-center gap-2">
+                <i data-lucide="database" class="w-3.5 h-3.5 text-zinc-400"></i>
+                <span>Persistence</span>
+              </td>
+              <td class="py-3 px-4 font-mono text-zinc-400">MongoDB + Mongoose</td>
+              <td class="py-3 px-4 text-zinc-400 hidden sm:table-cell">Atomic attendance insertion preventing concurrent double-scanning for the same session.</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-white flex items-center gap-2">
+                <i data-lucide="qr-code" class="w-3.5 h-3.5 text-zinc-400"></i>
+                <span>QR Rotation</span>
+              </td>
+              <td class="py-3 px-4 font-mono text-zinc-400">QRCode.js + Node Crypto</td>
+              <td class="py-3 px-4 text-zinc-400 hidden sm:table-cell">HMAC-SHA256 signature containing session ID and millisecond epoch timestamp.</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-white flex items-center gap-2">
+                <i data-lucide="phone-call" class="w-3.5 h-3.5 text-zinc-400"></i>
+                <span>Notifications</span>
+              </td>
+              <td class="py-3 px-4 font-mono text-zinc-400">Twilio REST API Client</td>
+              <td class="py-3 px-4 text-zinc-400 hidden sm:table-cell">Automated SMS/WhatsApp alerts sent to verified parent or student phone numbers.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PROJECT LAUNCH CALLOUT -->
+    <section class="pt-2">
+      <div class="linear-panel p-6 sm:p-8 rounded-xl border border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="space-y-1.5 text-center sm:text-left">
+          <h3 class="text-lg font-semibold text-white">
+            Ready to test live attendance verification?
+          </h3>
+          <p class="text-xs text-zinc-400 max-w-xl">
+            Access the active lecturer dashboard to generate dynamic rotating QR codes, or test the student mobile scanner with geo-fencing and device fingerprinting.
+          </p>
+          <div class="text-[11px] font-mono text-zinc-500 pt-1">
+            Active Endpoint: <span id="callout-backend-url" class="text-zinc-400">https://smart-qr-attendance.onrender.com</span>
+          </div>
+        </div>
+
+        <button onclick="switchView('portal')" class="px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-medium text-xs hover:bg-white transition-all flex items-center gap-2 flex-shrink-0">
+          <span>Open Portal Gateway</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- VIEW 2: LIVE PORTAL GATEWAY -->
+  <main id="view-portal" class="hidden flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-12 space-y-8">
+    <div class="border-b border-white/[0.08] pb-4 flex items-center justify-between">
+      <div>
+        <div class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Live System Gateway</div>
+        <h2 class="text-2xl font-semibold text-white mt-1">Smart QR Attendance Portal Access</h2>
+      </div>
+      <button onclick="switchView('overview')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#121316] border border-white/[0.08] text-zinc-300 hover:text-white text-xs font-medium transition-colors">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-zinc-400"></i>
+        <span>Back to Blueprint</span>
+      </button>
+    </div>
+
+    <!-- Portal Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Lecturer / Faculty Portal -->
+      <div class="linear-panel p-6 rounded-xl space-y-4 flex flex-col justify-between">
+        <div class="space-y-2">
+          <div class="w-10 h-10 rounded-lg bg-[#16171a] border border-white/10 flex items-center justify-center text-zinc-300">
+            <i data-lucide="presentation" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-semibold text-white">Faculty & Lecturer Portal</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Create attendance sessions, project rotating QR codes with 5-second TTL, define lecture hall GPS coordinates, and view live real-time check-in logs.
+          </p>
+        </div>
+        <div class="pt-4 space-y-2">
+          <a id="btn-portal-login" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-lg bg-zinc-100 text-zinc-950 font-medium text-xs hover:bg-white transition-colors flex items-center justify-center gap-2">
+            <span>Access Faculty Dashboard</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+          <span class="block text-[11px] text-zinc-500 font-mono text-center">Requires Teacher Access Passcode (ADMIN_SECRET)</span>
+        </div>
+      </div>
+
+      <!-- Student Verification Portal -->
+      <div class="linear-panel p-6 rounded-xl space-y-4 flex flex-col justify-between">
+        <div class="space-y-2">
+          <div class="w-10 h-10 rounded-lg bg-[#16171a] border border-white/10 flex items-center justify-center text-zinc-300">
+            <i data-lucide="qr-code" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-semibold text-white">Student Mobile Scanner</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Register your profile, enroll your smartphone's hardware canvas fingerprint, and scan dynamic QR codes within the verified 10m lecture hall perimeter.
+          </p>
+        </div>
+        <div class="pt-4 space-y-2">
+          <a id="btn-portal-register" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-lg bg-[#16171a] border border-white/[0.08] text-zinc-200 font-medium text-xs hover:bg-zinc-800 hover:text-white transition-colors flex items-center justify-center gap-2">
+            <span>Student Registration & Enrollment</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+          <span class="block text-[11px] text-zinc-500 font-mono text-center">Enrolls WebGL & device fingerprint on first login</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Endpoint Telemetry -->
+    <div class="linear-card p-4 rounded-xl text-xs font-mono space-y-2 border border-white/[0.08]">
+      <div class="flex items-center justify-between text-zinc-400">
+        <span>Backend Host:</span>
+        <span id="telemetry-host" class="text-zinc-200">https://smart-qr-attendance.onrender.com</span>
+      </div>
+      <div class="flex items-center justify-between text-zinc-400">
+        <span>Database Status:</span>
+        <span id="telemetry-db" class="text-amber-400">Checking...</span>
+      </div>
+      <div class="flex items-center justify-between text-zinc-400">
+        <span>Health Endpoint:</span>
+        <span id="telemetry-health" class="text-zinc-400">/health</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Settings Modal (Configure Active Backend URL) -->
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-[#121316] border border-white/[0.08] rounded-xl p-5 space-y-4 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+        <h4 class="text-sm font-semibold text-white flex items-center gap-2">
+          <i data-lucide="settings" class="w-4 h-4 text-zinc-400"></i>
+          <span>Configure Backend URL</span>
+        </h4>
+        <button onclick="toggleSettingsModal(false)" class="text-zinc-500 hover:text-zinc-300 text-xs p-1 rounded hover:bg-zinc-800">
+          ✕
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveSettings(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-mono text-zinc-300 mb-1">
+            Active Backend URL (Render or Local)
+          </label>
+          <input
+            id="input-backend-url"
+            type="url"
+            required
+            placeholder="https://smart-qr-attendance.onrender.com"
+            class="w-full bg-[#16171a] border border-white/[0.08] focus:border-white/20 rounded-lg px-3 py-2 text-xs font-mono text-zinc-100 placeholder-zinc-600 focus:outline-none"
+          />
+          <p class="text-[11px] text-zinc-500 mt-1">
+            Enter your deployed Render web service URL (or <code>http://localhost:3000</code>).
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="toggleSettingsModal(false)" class="px-3 py-1.5 rounded-md bg-[#16171a] border border-white/[0.08] text-zinc-300 text-xs hover:bg-zinc-800 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="px-3.5 py-1.5 rounded-md bg-zinc-100 text-zinc-950 text-xs font-medium hover:bg-white transition-colors">
+            Save & Reconnect
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-12 opacity-0 transition-all duration-300 pointer-events-none bg-[#121316] border border-white/10 text-zinc-200 px-4 py-2.5 rounded-lg shadow-2xl font-mono text-xs flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toast-msg">Copied to clipboard</span>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // Default or stored backend URL
+    const DEFAULT_BACKEND_URL = window.location.port === '3000' 
+      ? window.location.origin 
+      : 'https://smart-qr-attendance.onrender.com';
+
+    let currentBackendUrl = localStorage.getItem('smart_qr_backend_url') || DEFAULT_BACKEND_URL;
+
+    function updateBackendLinks() {
+      const cleanUrl = currentBackendUrl.replace(/\/+$/, '');
+      
+      const heroBtn = document.getElementById('hero-portal-btn');
+      if (heroBtn) heroBtn.href = `${cleanUrl}/`;
+
+      const loginBtn = document.getElementById('btn-portal-login');
+      if (loginBtn) loginBtn.href = `${cleanUrl}/login`;
+
+      const regBtn = document.getElementById('btn-portal-register');
+      if (regBtn) regBtn.href = `${cleanUrl}/register`;
+
+      const calloutUrl = document.getElementById('callout-backend-url');
+      if (calloutUrl) calloutUrl.innerText = cleanUrl;
+
+      const telemHost = document.getElementById('telemetry-host');
+      if (telemHost) telemHost.innerText = cleanUrl;
+
+      const inputUrl = document.getElementById('input-backend-url');
+      if (inputUrl) inputUrl.value = cleanUrl;
+    }
+
+    async function checkBackendHealth() {
+      const cleanUrl = currentBackendUrl.replace(/\/+$/, '');
+      const badge = document.getElementById('backend-health-badge');
+      const dot = document.getElementById('backend-health-dot');
+      const text = document.getElementById('backend-health-text');
+      const telemDb = document.getElementById('telemetry-db');
+
+      try {
+        const res = await fetch(`${cleanUrl}/health`, { signal: AbortSignal.timeout(4000) });
+        if (res.ok) {
+          const data = await res.json().catch(() => ({}));
+          badge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border bg-zinc-900/80 text-emerald-400 border-emerald-500/20';
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+          text.innerText = 'Online';
+          if (telemDb) {
+            telemDb.innerText = data.database === 'connected' ? 'Connected (Atlas)' : 'Ready (Standalone)';
+            telemDb.className = data.database === 'connected' ? 'text-emerald-400' : 'text-zinc-400';
+          }
+        } else {
+          badge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border bg-zinc-900/80 text-amber-400 border-amber-500/20';
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+          text.innerText = 'Awakening';
+          if (telemDb) telemDb.innerText = 'Awakening...';
+        }
+      } catch (e) {
+        badge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border bg-zinc-900/80 text-rose-400 border-rose-500/20';
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-rose-400';
+        text.innerText = 'Offline';
+        if (telemDb) telemDb.innerText = 'Unreachable';
+      }
+    }
+
+    function switchView(view) {
+      const viewOverview = document.getElementById('view-overview');
+      const viewPortal = document.getElementById('view-portal');
+      const tabOverview = document.getElementById('tab-btn-overview');
+      const tabPortal = document.getElementById('tab-btn-portal');
+
+      if (view === 'portal') {
+        viewOverview.classList.add('hidden');
+        viewPortal.classList.remove('hidden');
+        tabPortal.className = 'flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all bg-zinc-800 text-white shadow-sm';
+        tabOverview.className = 'flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all text-zinc-400 hover:text-zinc-200';
+      } else {
+        viewPortal.classList.add('hidden');
+        viewOverview.classList.remove('hidden');
+        tabOverview.className = 'flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all bg-zinc-800 text-white shadow-sm';
+        tabPortal.className = 'flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all text-zinc-400 hover:text-zinc-200';
+      }
+    }
+
+    function toggleSettingsModal(show) {
+      const modal = document.getElementById('settings-modal');
+      if (show) modal.classList.remove('hidden');
+      else modal.classList.add('hidden');
+    }
+
+    function handleSaveSettings(e) {
+      e.preventDefault();
+      const input = document.getElementById('input-backend-url');
+      if (input && input.value) {
+        currentBackendUrl = input.value.trim().replace(/\/+$/, '');
+        localStorage.setItem('smart_qr_backend_url', currentBackendUrl);
+        updateBackendLinks();
+        checkBackendHealth();
+        toggleSettingsModal(false);
+      }
+    }
+
+    // Initialize
+    updateBackendLinks();
+    checkBackendHealth();
+    setInterval(checkBackendHealth, 30000);
+  </script>
+</body>
+</html>
